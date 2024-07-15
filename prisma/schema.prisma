@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  MEMBER
+  OWNER
+}
+
+enum Provider {
+  PASSWORD
+  GOOGLE
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+  DRIVER
+}
+
+model User {
+  id               String    @id @default(uuid())
+  hubspotId        String?
+  email            String    @unique
+  imageUrl         String?
+  stripeCustomerId String?
+  name             String
+  password         String?
+  provider         Provider  @default(PASSWORD)
+  role             Role      @default(OWNER)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  members      Member[]
+  transactions Transaction[]
+  companyUsers CompanyUser[]
+}
+
+enum CompanyUserRole {
+  ADMINISTRATOR
+}
+
+model CompanyUser {
+  id        String          @id @default(uuid())
+  companyId String
+  userId    String
+  role      CompanyUserRole @default(ADMINISTRATOR)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  deletedAt DateTime?
+
+  company Company @relation(fields: [companyId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model Member {
+  id                  String    @id @default(uuid())
+  user                User?     @relation(fields: [userId], references: [id])
+  userId              String?   @unique
+  addressId           String?
+  phoneNumber         String?
+  note                String    @default("")
+  email               String?
+  firstName           String
+  lastName            String    @default("")
+  companyId           String
+  imageUrl            String?
+  company             Company   @relation(fields: [companyId], references: [id])
+  membershipExpiresAt DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  deletedAt           DateTime?
+
+  address Address? @relation(fields: [addressId], references: [id])
+}
+
+model Company {
+  id                String  @id @default(uuid())
+  name              String
+  addressId         String?
+  description       String?
+  imageUrl          String?
+  imageCardBackUrl  String?
+  imageCardFrontUrl String?
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+  address      Address?      @relation(fields: [addressId], references: [id])
+  companyUsers CompanyUser[]
+  members      Member[]
+}
+
+model Address {
+  id               String    @id @default(uuid())
+  unit             String?
+  formattedAddress String
+  streetNumber     String?
+  streetName       String?
+  city             String?
+  region           String?
+  postalCode       String?
+  country          String
+  latitude         Float
+  longitude        Float
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+  members          Member[]
+  companies        Company[]
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+model Transaction {
+  id                    String            @id @default(uuid())
+  userId                String
+  user                  User              @relation(fields: [userId], references: [id])
+  amount                Float
+  currency              String            @default("EUR")
+  stripeSessionId       String
+  stripePaymentIntentId String?
+  status                TransactionStatus @default(PENDING)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  deletedAt             DateTime?
+}
