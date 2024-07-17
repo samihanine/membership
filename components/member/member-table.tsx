@@ -27,12 +27,12 @@ export default async function MemberTable({ members }: { members: Member[] }) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="hidden w-[100px] sm:table-cell">
+          <TableHead className="w-[100px]">
             <span className="sr-only">Image</span>
           </TableHead>
           <TableHead>Prénom</TableHead>
           <TableHead>Nom</TableHead>
-          <TableHead>Email</TableHead>
+          <TableHead className="hidden md:table-cell">Email</TableHead>
           <TableHead className="hidden md:table-cell">Phone number</TableHead>
           <TableHead className="hidden md:table-cell">Expire le</TableHead>
           <TableHead className="hidden md:table-cell">Ajouté le</TableHead>
@@ -49,24 +49,26 @@ export default async function MemberTable({ members }: { members: Member[] }) {
           )
           .map((member) => (
             <TableRow key={member.id}>
-              <TableCell className="hidden sm:table-cell">
+              <TableCell>
                 <Avatar className="w-11 h-11 text-base">
-                  {!!member.imageUrl?.length && (
+                  {!!member.imageUrl?.length ? (
                     <Image
                       src={member.imageUrl as string}
                       alt="Avatar"
                       width={44}
                       height={44}
+                      className="!w-full object-cover"
                     />
+                  ) : (
+                    <AvatarFallback>
+                      {member.firstName[0]} {member.lastName?.[0] || ""}
+                    </AvatarFallback>
                   )}
-                  <AvatarFallback>
-                    {member.firstName[0]} {member.lastName?.[0] || ""}
-                  </AvatarFallback>
                 </Avatar>
               </TableCell>
               <TableCell className="font-medium">{member.firstName}</TableCell>
               <TableCell>{member.lastName}</TableCell>
-              <TableCell>
+              <TableCell className="hidden md:table-cell">
                 {member.email?.length ? member.email : "N/A"}
               </TableCell>
               <TableCell className="hidden md:table-cell">

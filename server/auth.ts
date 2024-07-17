@@ -6,6 +6,9 @@ import jsonwebtoken from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { googleClient } from "@/lib/google";
 import { createUser } from "./user";
+import { z } from "zod";
+import { actionClient } from "@/lib/safe-action";
+import { registerSchema } from "@/lib/schemas";
 
 const hashPassword = async (password: string): Promise<string> => {
   try {
@@ -129,39 +132,39 @@ export const handleGoogleCallback = async ({
   return `/`;
 };
 
-export const signUpWithPassword = async ({
-  email,
-  password,
-  name,
-}: {
-  email: string;
-  password: string;
-  name: string;
-}) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      email: email,
-    },
+export const signUpWithPassword = actionClient
+  .schema(registerSchema)
+  .action(async ({ parsedInput }) => {
+    const { email, name, password, confirmPassword } = parsedInput;
+
+    if (password !== confirmPassword) {
+      return { error: "Les mots de passe ne correspondent pas" };
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (user) {
+      return { error: "Cet utilisateur existe déjà" };
+    }
+
+    const hash = await hashPassword(password);
+
+    const newUser = await createUser({
+      email,
+      name,
+      password: hash,
+      provider: "PASSWORD",
+      role: "OWNER",
+    });
+
+    await createCookie({ userId: newUser.id });
+
+    redirect(`/`);
   });
-
-  if (user) {
-    return "Cette adresse email est déjà utilisée";
-  }
-
-  const hash = await hashPassword(password);
-
-  const newUser = await createUser({
-    email,
-    name,
-    password: hash,
-    provider: "PASSWORD",
-    role: "OWNER",
-  });
-
-  await createCookie({ userId: newUser.id });
-
-  redirect(`/`);
-};
 
 export const createCookie = async ({ userId }: { userId: string }) => {
   const accessToken = jsonwebtoken.sign(

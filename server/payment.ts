@@ -38,7 +38,7 @@ export async function createPaymentLink(): Promise<string> {
           currency: "eur",
           product_data: {
             name: "Paiement de cartes",
-            description: `Paiement de cartes pour l'entreprise`,
+            description: `Paiement de cartes pour l'organisation`,
             metadata: {
               userId: user.id,
             },

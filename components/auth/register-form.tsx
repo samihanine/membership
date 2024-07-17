@@ -1,94 +1,154 @@
 "use client";
 
-import GoogleButton from "./google-button";
-import Link from "next/link";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { displayError } from "@/lib/error";
+import { registerSchema } from "@/lib/schemas";
 import { signUpWithPassword } from "@/server/auth";
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import GoogleButton from "./google-button";
+
+const formSchema = registerSchema;
 
 const RegisterForm = () => {
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { executeAsync, status } = useAction(signUpWithPassword);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const result = await executeAsync(values);
 
-    setLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const name = formData.get("name") as string;
-
-    const result = await signUpWithPassword({
-      email,
-      password,
-      name,
-    });
-
-    if (result) {
-      setError(result);
+    if (result?.data?.error) {
+      return displayError({ message: result.data.error });
     }
 
-    setLoading(false);
+    if (
+      result?.serverError ||
+      result?.validationErrors ||
+      result?.bindArgsValidationErrors
+    ) {
+      return displayError({
+        message: "Une erreur s'est produite lors de la création du compte",
+      });
+    }
   };
 
   return (
     <div>
-      <div className="space-y-3 mb-10">
+      <div className="space-y-3 mb-4">
         <h3 className="text-xl font-semibold">S&apos;inscrire</h3>
         <p className="text-sm text-muted-foreground">
           Créez un compte pour accéder à votre espace personnel.
         </p>
       </div>
+      <div className="h-4" />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex gap-2">Name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="ex: John Doe"
+                    type="name"
+                    {...field}
+                    value={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex gap-2">Email</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="ex: john.doe@example.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex gap-2">Password</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex gap-2">Confirm Password</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="h-4" />
+          <div className="flex justify-end">
+            <Button
+              className="z-50 w-full"
+              type="submit"
+              disabled={status === "executing"}
+            >
+              Créer un compte
+            </Button>
+          </div>
+        </form>
+      </Form>
 
-      <form className="space-y-5" onSubmit={handleSubmit}>
-        <Input name="name" placeholder="Prénom et nom" />
-
-
-        <Input placeholder="Email" name="email" type="email" />
-
-        <Input
-          name="password"
-          type="password"
-          min="8"
-          placeholder="Mot de passe"
-        />
-
-        <Input
-          name="password_confirmation"
-          type="password"
-          min="8"
-          placeholder="Confirmer le mot de passe"
-        />
-
-        {error && (
-          <p className="text-sm text-red-500 text-medium text-center">
-            {error}
-          </p>
-        )}
-
-        <div className="space-y-2 !mt-10 !mb-8">
-          <Button className="!w-full" disabled={loading}>
-            {loading ? "Chargement..." : "S'inscrire"}
-          </Button>
-
-          <GoogleButton>
-            S&apos;inscrire avec Google
-          </GoogleButton>
-        </div>
-
-        <p className="text-sm text-center ">
-          Vous avez déjà un compte ?{" "}
-          <Link
-            href={`/login`}
-            className="font-bold !w-full hover:underline"
-          >
-            Se connecter
-          </Link>
-        </p>
-      </form>
+      <div className="h-4" />
+      <GoogleButton>S&apos;inscrire avec Google</GoogleButton>
+      <div className="h-4" />
+      <p className="text-sm text-center ">
+        Vous avez déjà un compte ?{" "}
+        <Link
+          href={`/login`}
+          className="font-bold text-primary !w-full hover:underline"
+        >
+          Se connecter
+        </Link>
+      </p>
     </div>
   );
 };

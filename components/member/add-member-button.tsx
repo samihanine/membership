@@ -35,7 +35,7 @@ export default function AddMemberButton({
         <SheetHeader>
           <SheetTitle>Ajouter un membre</SheetTitle>
           <SheetDescription>
-            Ajouter un membre à votre entreprise, vous pourrez ensuite lui
+            Ajouter un membre à votre organisation, vous pourrez ensuite lui
             envoyer une carte de membre.
           </SheetDescription>
           <div className="h-2" />

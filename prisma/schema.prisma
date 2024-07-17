@@ -37,50 +37,66 @@ model User {
   updatedAt        DateTime  @updatedAt
   deletedAt        DateTime?
 
-  members      Member[]
-  transactions Transaction[]
-  companyUsers CompanyUser[]
+  members           Member[]
+  transactions      Transaction[]
+  organizationUsers OrganizationUser[]
 }
 
-enum CompanyUserRole {
+enum OrganizationUserRole {
   ADMINISTRATOR
 }
 
-model CompanyUser {
-  id        String          @id @default(uuid())
-  companyId String
-  userId    String
-  role      CompanyUserRole @default(ADMINISTRATOR)
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-  deletedAt DateTime?
+model Invitation {
+  id             String               @id @default(uuid())
+  email          String
+  organizationId String
+  role           OrganizationUserRole
+  token          String
+  accepted       Boolean              @default(false)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  deletedAt      DateTime?
 
-  company Company @relation(fields: [companyId], references: [id])
-  user    User    @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+}
+
+model OrganizationUser {
+  id             String               @id @default(uuid())
+  organizationId String
+  userId         String
+  role           OrganizationUserRole @default(ADMINISTRATOR)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  deletedAt      DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
 }
 
 model Member {
-  id                  String    @id @default(uuid())
-  user                User?     @relation(fields: [userId], references: [id])
-  userId              String?   @unique
+  id                  String       @id @default(uuid())
+  user                User?        @relation(fields: [userId], references: [id])
+  userId              String?      @unique
   addressId           String?
   phoneNumber         String?
-  note                String    @default("")
+  note                String       @default("")
   email               String?
   firstName           String
-  lastName            String    @default("")
-  companyId           String
+  lastName            String       @default("")
+  organizationId      String
   imageUrl            String?
-  company             Company   @relation(fields: [companyId], references: [id])
+  organization        Organization @relation(fields: [organizationId], references: [id])
   membershipExpiresAt DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  formattedAddress    String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
   deletedAt           DateTime?
 
-  address Address? @relation(fields: [addressId], references: [id])
+  address Address?  @relation(fields: [addressId], references: [id])
+  Command Command[]
 }
 
-model Company {
+model Organization {
   id                String  @id @default(uuid())
   name              String
   addressId         String?
@@ -88,17 +104,19 @@ model Company {
   imageUrl          String?
   imageCardBackUrl  String?
   imageCardFrontUrl String?
+  formattedAddress  String?
 
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  deletedAt    DateTime?
-  address      Address?      @relation(fields: [addressId], references: [id])
-  companyUsers CompanyUser[]
-  members      Member[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  deletedAt         DateTime?
+  address           Address?           @relation(fields: [addressId], references: [id])
+  organizationUsers OrganizationUser[]
+  members           Member[]
+  invitations       Invitation[]
 }
 
 model Address {
-  id               String    @id @default(uuid())
+  id               String         @id @default(uuid())
   unit             String?
   formattedAddress String
   streetNumber     String?
@@ -109,11 +127,11 @@ model Address {
   country          String
   latitude         Float
   longitude        Float
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
   deletedAt        DateTime?
   members          Member[]
-  companies        Company[]
+  organizations    Organization[]
 }
 
 enum TransactionStatus {
@@ -134,4 +152,26 @@ model Transaction {
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
   deletedAt             DateTime?
+
+  command Command?
+}
+
+enum CommandStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+model Command {
+  id            String        @id @default(uuid())
+  transactionId String        @unique
+  memberId      String
+  status        CommandStatus @default(PENDING)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  transaction Transaction @relation(fields: [transactionId], references: [id])
+  member      Member      @relation(fields: [memberId], references: [id])
 }

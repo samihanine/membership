@@ -7,7 +7,7 @@ export function LogoText({ className = "" }: { className?: string }) {
   return (
     <div className={cn("flex items-center space-x-4", className)}>
       <Logo />
-      <span className="text-xl font-bold">AssoScale</span>
+      <span className="text-xl font-bold">Membership</span>
     </div>
   );
 }

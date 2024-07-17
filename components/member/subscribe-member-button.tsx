@@ -27,9 +27,9 @@ export default function SubscribeMemberButton({
         <SheetHeader>
           <SheetTitle>Souscrire un membre</SheetTitle>
           <SheetDescription>
-            Vous pouvez souscrire un membre à votre entreprise, en lui envoyant
-            une carte de membre ou en lui envoyant un lien d'invitation par
-            email.
+            Vous pouvez souscrire un membre à votre organisation, en lui
+            envoyant une carte de membre ou en lui envoyant un lien d'invitation
+            par email.
           </SheetDescription>
           <div className="h-2" />
         </SheetHeader>

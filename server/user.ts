@@ -3,6 +3,9 @@ import jsonwebtoken from "jsonwebtoken";
 import { cookies } from "next/headers";
 import prisma from "../lib/prisma";
 import { User } from "@prisma/client";
+import { authActionClient } from "@/lib/safe-action";
+import { z } from "zod";
+import { sendEmail } from "./email";
 
 export const getCurrentUser = async () => {
   const cookieStore = cookies();
@@ -29,12 +32,12 @@ export const getCurrentUser = async () => {
   const user = await prisma.user.findUnique({
     where: { id: result },
     include: {
-      companyUsers: {
+      organizationUsers: {
         include: {
-          company: true,
+          organization: true,
         },
       },
-    }
+    },
   });
 
   return user || null;
@@ -68,6 +71,12 @@ export const createUser = async (data: {
   imageUrl?: string;
 }) => {
   let hubspotId = undefined;
+
+  await sendEmail({
+    to: data.email,
+    subject: "Bienvenue sur notre plateforme",
+    text: `Bonjour, nous sommes ravis de vous accueillir sur notre plateforme !`,
+  });
 
   return await prisma.user.create({
     data: {

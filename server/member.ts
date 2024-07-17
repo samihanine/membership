@@ -14,8 +14,7 @@ export const updateMember = authActionClient
       data,
     });
 
-    revalidatePath(`/companies/${result.companyId}`);
-    revalidatePath(`/companies/${result.companyId}/members`);
+    revalidatePath(`/organizations/${result.organizationId}/members`);
 
     return result;
   });
@@ -30,14 +29,14 @@ export const createMember = authActionClient
     }),
   )
   .action(async ({ parsedInput: data }) => {
+    console.log(data);
     const result = await prisma.member.create({
       data: {
         ...data,
       },
     });
 
-    revalidatePath(`/companies/${result.companyId}`);
-    revalidatePath(`/companies/${result.companyId}/members`);
+    revalidatePath(`/organizations/${result.organizationId}/members`);
 
     return result;
   });
@@ -54,8 +53,7 @@ export const deleteMember = authActionClient
       },
     });
 
-    revalidatePath(`/companies/${result.companyId}`);
-    revalidatePath(`/companies/${result.companyId}/members`);
+    revalidatePath(`/organizations/${result.organizationId}/members`);
 
     return result;
   });
@@ -72,11 +70,11 @@ export const getMember = authActionClient
   });
 
 export const getMembers = authActionClient
-  .schema(z.object({ companyId: z.string() }))
+  .schema(z.object({ organizationId: z.string() }))
   .action(async ({ parsedInput }) => {
     return await prisma.member.findMany({
       where: {
-        companyId: parsedInput.companyId,
+        organizationId: parsedInput.organizationId,
         deletedAt: null,
       },
     });

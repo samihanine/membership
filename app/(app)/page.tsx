@@ -8,9 +8,9 @@ export default async function Page() {
     return redirect("/login");
   }
 
-  if (!user.companyUsers.length) {
+  if (!user.organizationUsers.length) {
     return redirect("/onboarding");
   }
 
-  return redirect(`/companies/${user.companyUsers[0].companyId}`);
+  return redirect(`/organizations/${user.organizationUsers[0].organizationId}`);
 }

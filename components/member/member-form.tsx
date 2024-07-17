@@ -22,6 +22,8 @@ import { useParams } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useEffect } from "react";
 import Image from "next/image";
+import UploadImageInput from "../upload/upload-image-input";
+import { useAction } from "next-safe-action/hooks";
 
 const formSchema = memberSchema.omit({
   createdAt: true,
@@ -36,6 +38,11 @@ export function MemberForm({
   member?: Member;
   onSuccess?: (member: Member) => void;
 }) {
+  const { executeAsync: updateAsync, status: updateStatus } =
+    useAction(updateMember);
+  const { executeAsync: createAsync, status: createStatus } =
+    useAction(createMember);
+
   const params = useParams();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(member ? formSchema : formSchema.omit({ id: true })),
@@ -46,7 +53,8 @@ export function MemberForm({
       email: member?.email ?? "",
       phoneNumber: member?.phoneNumber ?? "",
       imageUrl: member?.imageUrl ?? "",
-      companyId: member?.companyId ?? (params.companyId as string) ?? "",
+      organizationId:
+        (params.organizationId as string) ?? member?.organizationId ?? "",
       membershipExpiresAt: member?.membershipExpiresAt,
     },
   });
@@ -56,19 +64,16 @@ export function MemberForm({
   }, [form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
     const result = member
-      ? await updateMember(values as Member & { id: string })
-      : await createMember(values);
-
-    console.log(result);
+      ? await updateAsync(values as Member & { id: string })
+      : await createAsync(values);
 
     if (result?.data?.id) {
       onSuccess?.(result.data as Member);
     } else {
       displayError({
         message:
-          "Une erreur s'est produite lors de la création de l'entreprise",
+          "Une erreur s'est produite lors de la création de l'organisation",
       });
     }
   };
@@ -80,41 +85,27 @@ export function MemberForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="flex justify-between items-center gap-4">
           <Avatar className="w-20 h-20 text-xl">
-            {!!imageUrl.length && typeof imageUrl === "string" && (
+            {!!imageUrl.length && typeof imageUrl === "string" ? (
               <Image
                 src={form.getValues("imageUrl") as string}
                 alt="Avatar"
                 width={44}
                 height={44}
+                className="!w-full object-cover"
               />
+            ) : (
+              <AvatarFallback>
+                {form.getValues("firstName")[0]}{" "}
+                {form.getValues("lastName")?.[0] || ""}
+              </AvatarFallback>
             )}
-            <AvatarFallback>
-              {form.getValues("firstName")[0]}{" "}
-              {form.getValues("lastName")?.[0] || ""}
-            </AvatarFallback>
           </Avatar>
 
-          <Input
-            type="file"
-            accept="image/*"
-            className="!w-fit"
-            onChange={async (e) => {
-              const file = e.target.files?.[0];
-
-              if (!file) return;
-
-              if (file.size > 1_000_000) {
-                displayError({ message: "L'image ne doit pas dépasser 1Mo" });
-                return;
-              }
-
-              const reader = new FileReader();
-              reader.readAsDataURL(file);
-              reader.onload = () => {
-                console.log(reader.result);
-                form.setValue("imageUrl", reader.result as string);
-                form.trigger("imageUrl");
-              };
+          <UploadImageInput
+            folder="MEMBER_PROFILE_PICTURES"
+            setImageUrl={(url) => {
+              form.setValue("imageUrl", url);
+              form.trigger("imageUrl");
             }}
           />
         </div>
@@ -184,7 +175,7 @@ export function MemberForm({
         />
         <FormField
           control={form.control}
-          name="phoneNumber"
+          name="membershipExpiresAt"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="flex gap-2">
@@ -192,14 +183,24 @@ export function MemberForm({
                 <FormDescription>(optionnel)</FormDescription>
               </FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <Input
+                  type="date"
+                  {...field}
+                  value={field.value?.toDateString() || ""}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <div className="flex justify-end">
-          <Button className="z-50" type="submit">
+          <Button
+            className="z-50"
+            type="submit"
+            disabled={
+              updateStatus === "executing" || createStatus === "executing"
+            }
+          >
             {member ? "Mettre à jour" : "Ajouter un membre"}
           </Button>
         </div>
