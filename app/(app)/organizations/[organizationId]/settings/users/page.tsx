@@ -24,8 +24,8 @@ export default async function Page({
   return (
     <>
       <div>
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex items-center justify-between flex-wrap gap-5">
+          <div className="flex flex-col">
             <CardTitle className="text-lg mb-1">
               Gérer les accès des utilisateurs
             </CardTitle>
@@ -37,7 +37,7 @@ export default async function Page({
 
           <InviteUserButton organizationId={params.organizationId} />
         </div>
-        <div className="border-b border-border mt-6" />
+        <div className="border-b border-border mt-6 w-full overflow-x-auto" />
         <OrganizationUserTable
           organizationUsers={
             (organizationUsers?.data as OrganizationUser[]) || []

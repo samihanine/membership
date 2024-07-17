@@ -15,12 +15,9 @@ export default async function Page() {
       <div>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg mb-1">
-              Historique des commandes
-            </CardTitle>
+            <CardTitle className="text-lg mb-1">Facturation</CardTitle>
             <CardDescription>
-              Ci-dessous l&apos;historique de vos commandes de cartes avec leurs
-              factures
+              Gérez vos informations de facturation
             </CardDescription>
           </div>
         </div>

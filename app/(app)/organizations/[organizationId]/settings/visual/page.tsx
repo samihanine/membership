@@ -58,16 +58,21 @@ export default async function Page({
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col items-center gap-2">
-        <CardTitle>Vos visuels</CardTitle>
-        <CardDescription>
-          Personnalisez les visuels de votre organisation
-        </CardDescription>
+      <div>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg mb-1">Visuel des cartes</CardTitle>
+            <CardDescription>
+              Personnalisez le visuel des cartes de vos membres
+            </CardDescription>
+          </div>
+        </div>
+        <div className="border-b border-border mt-6" />
       </div>
 
       <div className="flex w-full max-w-5xl items-center justify-evenly mx-auto flex-wrap gap-5">
         {cards.map((card, index) => (
-          <Card key={index}>
+          <Card key={index} className="!shadow-none">
             <CardHeader>
               <CardTitle>{card.title}</CardTitle>
               <CardDescription>{card.description}</CardDescription>
@@ -75,23 +80,24 @@ export default async function Page({
             <CardContent>
               <Image
                 src={card.imageUrl}
-                width={CARD_WIDTH}
-                height={CARD_HEIGHT}
+                width={(CARD_WIDTH / CARD_HEIGHT) * 200}
+                height={(CARD_HEIGHT / CARD_WIDTH) * 200}
                 alt={card.title}
                 className="border border-border"
               />
             </CardContent>
             <CardFooter className="flex gap-3 justify-center">
+              <a href={card.imageUrl} download>
+                <Button variant={"outline"}>
+                  <DownloadIcon className="h-4 w-4 mr-1" />
+                  Télécharger
+                </Button>
+              </a>
+
               <EditVisualButton
                 visualType={card.visualType}
                 organization={organization.data as Organization}
               />
-              <a href={card.imageUrl} download>
-                <Button variant={"outline"}>
-                  <DownloadIcon className="h-4 w-4 mr-1" />
-                  Télécharger le template
-                </Button>
-              </a>
             </CardFooter>
           </Card>
         ))}

@@ -39,7 +39,7 @@ export default function MembersPage({
             <SubscribeMemberButton members={selectedMembers}>
               <Button variant={"outline"}>
                 <CreditCardIcon className="h-3.5 w-3.5 mr-2" />
-                Souscrire les membres
+                Commandez les cartes
               </Button>
             </SubscribeMemberButton>
           ) : (
@@ -53,7 +53,7 @@ export default function MembersPage({
               }}
             >
               <CreditCardIcon className="h-3.5 w-3.5 mr-2" />
-              Souscrire les membres
+              Commandez les cartes
             </Button>
           )}
 

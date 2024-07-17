@@ -7,9 +7,7 @@ export async function GET(request: NextRequest) {
   const sessionId = searchParams.get("session_id");
 
   if (!sessionId?.length) {
-    return NextResponse.redirect(
-      process.env.NEXT_PUBLIC_BASE_URL + "/reservation?error=payment_failed",
-    );
+    return NextResponse.redirect(process.env.NEXT_PUBLIC_BASE_URL + "/");
   }
 
   let error: string | undefined = undefined;
@@ -18,12 +16,8 @@ export async function GET(request: NextRequest) {
   });
 
   if (error) {
-    return NextResponse.redirect(
-      process.env.NEXT_PUBLIC_BASE_URL + "/reservation?error=" + error,
-    );
+    return NextResponse.redirect(process.env.NEXT_PUBLIC_BASE_URL + "/");
   }
 
-  return NextResponse.redirect(
-    process.env.NEXT_PUBLIC_BASE_URL + "/reservation",
-  );
+  return NextResponse.redirect(process.env.NEXT_PUBLIC_BASE_URL + "/");
 }

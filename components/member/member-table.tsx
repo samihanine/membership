@@ -23,6 +23,7 @@ import {
 } from "../ui/table";
 import DeleteMemberButton from "./delete-member-button";
 import EditMemberButton from "./edit-member-button";
+import SubscribeMembersButton from "./subscribe-members-button";
 
 export default function MemberTable({
   members,
@@ -58,7 +59,7 @@ export default function MemberTable({
             Date d&apos;expiration
           </TableHead>
 
-          <TableHead className="hidden md:table-cell">Carte</TableHead>
+          <TableHead>Commander</TableHead>
           <TableHead>
             <span className="sr-only">Actions</span>
           </TableHead>
@@ -127,6 +128,7 @@ export default function MemberTable({
                     : "N/A"}
                 </Badge>
               </TableCell>
+
               <TableCell className="hidden md:table-cell">
                 {!!member.commands?.length && (
                   <>
@@ -142,9 +144,14 @@ export default function MemberTable({
                   </>
                 )}
                 {!member.commands?.length && (
-                  <Badge variant="destructive">Aucune</Badge>
+                  <SubscribeMembersButton members={[member]}>
+                    <Button variant="outline" size="sm">
+                      Commander
+                    </Button>
+                  </SubscribeMembersButton>
                 )}
               </TableCell>
+
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

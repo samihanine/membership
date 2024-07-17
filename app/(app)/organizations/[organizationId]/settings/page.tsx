@@ -34,6 +34,9 @@ export default async function Page({
 
         <div className="border-b border-border mt-6" />
       </div>
+
+      <div className="mb-6" />
+
       <OrganizationForm organization={organization.data as Organization} />
     </>
   );

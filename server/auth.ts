@@ -32,37 +32,38 @@ const comparePassword = async (password: string, hashedPassword: string) => {
   }
 };
 
-export const loginWithPassword = async ({
-  email,
-  password,
-  reservationId,
-}: {
-  email: string;
-  password: string;
-  reservationId?: string;
-}) => {
-  const user = await prisma.user.findUnique({
-    where: { email },
+export const loginWithPassword = actionClient
+  .schema(
+    z.object({
+      email: z.string().email(),
+      password: z.string(),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    const { email, password } = parsedInput;
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return { error: "Votre email est introuvable" };
+    }
+
+    if (user.provider !== "PASSWORD" || !user.password) {
+      return { error: "Veuillez vous connecter avec Google" };
+    }
+
+    const passwordMatch = await comparePassword(password, user.password);
+
+    if (!passwordMatch) {
+      return { error: "Le mot de passe est incorrect" };
+    }
+
+    await createCookie({ userId: user.id });
+
+    redirect(`/`);
   });
-
-  if (!user) {
-    return "Cet utilisateur n'existe pas";
-  }
-
-  if (user.provider !== "PASSWORD" || !user.password) {
-    return "You need to login with your social account";
-  }
-
-  const passwordMatch = await comparePassword(password, user.password);
-
-  if (!passwordMatch) {
-    return "Mot de passe incorrect";
-  }
-
-  await createCookie({ userId: user.id });
-
-  redirect(`/reservation`);
-};
 
 export const loginWithGoogle = async ({ state }: { state?: string }) => {
   let scopes = [

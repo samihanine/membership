@@ -43,9 +43,9 @@ export default function SubscribeMembersButton({
       <SheetTrigger>{children}</SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Souscrire des membres</SheetTitle>
+          <SheetTitle>Commandez des cartes</SheetTitle>
           <SheetDescription>
-            Vous pouvez souscrire les membres selectionnés à votre organisation,
+            Vous pouvez commandez les membres selectionnés à votre organisation,
             en lui envoyant une carte de membre ou en lui envoyant un lien
             d&apos;invitation par email.
           </SheetDescription>

@@ -31,10 +31,6 @@ export default async function Layout({
             label: "Membres",
           },
           {
-            href: `/organizations/${params.organizationId}/visual`,
-            label: "Visuel",
-          },
-          {
             href: `/organizations/${params.organizationId}/settings`,
             label: "Paramètres",
           },

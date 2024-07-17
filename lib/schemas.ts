@@ -88,6 +88,15 @@ export const registerSchema = z.object({
   }),
 });
 
+export const loginSchema = z.object({
+  email: z.string().email({
+    message: "L'adresse email est invalide",
+  }),
+  password: z.string().min(6, {
+    message: "Le mot de passe doit contenir au moins 6 caractères",
+  }),
+});
+
 export const uploadFileSchema = zfd.formData({
   folder: z.enum([
     "MEMBER_PROFILE_PICTURES",

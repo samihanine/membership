@@ -4,13 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import GoogleButton from "./google-button";
-import { useState } from "react";
 import { loginWithPassword } from "@/server/auth";
-import { Card } from "../ui/card";
+import { displayError } from "@/lib/error";
+import { useAction } from "next-safe-action/hooks";
 
 const LoginForm = () => {
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { executeAsync, status } = useAction(loginWithPassword);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,16 +18,14 @@ const LoginForm = () => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    setLoading(true);
+    const result = await executeAsync({ email, password });
 
-    const error = await loginWithPassword({ email, password });
-
-    if (error) {
-      setError(error);
+    if (result?.data?.error) {
+      displayError({ message: result?.data?.error });
     }
-
-    setLoading(false);
   };
+
+  const loading = status === "executing";
 
   return (
     <div>
@@ -48,12 +45,6 @@ const LoginForm = () => {
           placeholder="Mot de passe"
           name="password"
         />
-
-        {error && (
-          <Card className="text-sm text-medium text-center p-2 bg-red-50 dark:bg-red-200">
-            <p className="text-red-500">{error}</p>
-          </Card>
-        )}
 
         <div className="space-y-2 !mt-10 !mb-8">
           <Button type="submit" className="!w-full" disabled={loading}>

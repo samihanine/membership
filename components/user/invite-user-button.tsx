@@ -27,9 +27,7 @@ export default function InviteUserButton({
         {children ?? (
           <Button className="gap-1">
             <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Inviter un utilisateur
-            </span>
+            <span className="sm:whitespace-nowrap">Inviter un utilisateur</span>
           </Button>
         )}
       </SheetTrigger>

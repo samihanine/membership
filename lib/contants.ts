@@ -1,2 +1,2 @@
-export const CARD_WIDTH = 370;
-export const CARD_HEIGHT = 225;
+export const CARD_WIDTH = 1277;
+export const CARD_HEIGHT = 779;
