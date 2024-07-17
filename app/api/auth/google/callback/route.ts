@@ -16,7 +16,6 @@ export async function GET(request: NextRequest) {
 
   const route = await handleGoogleCallback({ code, state, scopes }).catch(
     (error) => {
-      console.error(error);
       return "/login?error=google_login_failed";
     },
   );

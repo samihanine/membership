@@ -1,9 +1,9 @@
-import { Input } from "../ui/input";
-import { displayError } from "../../lib/error";
-import { useAction } from "next-safe-action/hooks";
-import { uploadFile } from "../../server/upload";
 import { type UploadFile } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
+import { useAction } from "next-safe-action/hooks";
+import { displayError } from "../../lib/error";
+import { uploadFile } from "../../server/upload";
+import { Input } from "../ui/input";
 
 export default function UploadImageInput({
   setImageUrl,
@@ -14,7 +14,7 @@ export default function UploadImageInput({
   setImageUrl: (url: string) => void;
   folder: UploadFile["folder"];
 }) {
-  const { executeAsync, status, result } = useAction(uploadFile);
+  const { executeAsync, status } = useAction(uploadFile);
 
   return (
     <Input
@@ -37,10 +37,6 @@ export default function UploadImageInput({
         formData.append("folder", folder);
 
         const result = await executeAsync(formData);
-
-        console.log(result?.validationErrors);
-        console.log(result?.bindArgsValidationErrors);
-        console.log(result?.serverError);
 
         if (result?.data?.fileUrl) {
           setImageUrl(result.data.fileUrl);

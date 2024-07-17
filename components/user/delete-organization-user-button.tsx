@@ -8,15 +8,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { OrganizationUser } from "@/lib/schemas";
 import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import React from "react";
 
-export default function AddOrganizationUserButton({
+export default function DeleteOrganizationUserButton({
   children,
+  organizationUser,
 }: {
   children?: React.ReactNode;
-  organizationId: string;
+  organizationUser: OrganizationUser;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -36,7 +38,8 @@ export default function AddOrganizationUserButton({
         <SheetHeader>
           <SheetTitle>Retirer un utilisateur</SheetTitle>
           <SheetDescription>
-            Retirer l&apos;accès d&apos;un utilisateur à votre organisation
+            Retirer l&apos;accès à l&apos;un utilisateur{" "}
+            {organizationUser.user.email} à votre organisation
           </SheetDescription>
           <div className="h-2" />
         </SheetHeader>

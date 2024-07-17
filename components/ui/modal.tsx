@@ -1,9 +1,9 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Drawer } from "vaul";
-import * as Dialog from "@radix-ui/react-dialog";
 import useMediaQuery from "@/hooks/useMediaQuery";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Dispatch, SetStateAction } from "react";
+import { Drawer } from "vaul";
 
 export function Modal({
   children,

@@ -70,7 +70,7 @@ export default async function Page({
         <div className="flex flex-col gap-2">
           <CardTitle>Dashboard</CardTitle>
           <CardDescription>
-            Vue d'ensemble des vos membres et vos commandes
+            Vue d&apos;ensemble des vos membres et vos commandes
           </CardDescription>
         </div>
 

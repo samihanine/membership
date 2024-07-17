@@ -24,6 +24,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import UploadImageInput from "../upload/upload-image-input";
 import { useAction } from "next-safe-action/hooks";
+import moment from "moment";
 
 const formSchema = memberSchema.omit({
   createdAt: true,
@@ -55,7 +56,9 @@ export function MemberForm({
       imageUrl: member?.imageUrl ?? "",
       organizationId:
         (params.organizationId as string) ?? member?.organizationId ?? "",
-      membershipExpiresAt: member?.membershipExpiresAt,
+      membershipExpiresAt:
+        member?.membershipExpiresAt ??
+        new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
     },
   });
 
@@ -175,18 +178,41 @@ export function MemberForm({
         />
         <FormField
           control={form.control}
+          name="formattedAddress"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex gap-2">
+                Adresse complète <FormDescription>(optionnel)</FormDescription>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="ex: 1 rue de la Paix, Paris, FR"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="membershipExpiresAt"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="flex gap-2">
-                Date d'expiration de l'adhésion{" "}
+                Date d&apos;expiration de l&apos;adhésion{" "}
                 <FormDescription>(optionnel)</FormDescription>
               </FormLabel>
               <FormControl>
                 <Input
                   type="date"
                   {...field}
-                  value={field.value?.toDateString() || ""}
+                  value={
+                    field.value
+                      ? moment(new Date(field.value)).format("YYYY-MM-DD")
+                      : ""
+                  }
                 />
               </FormControl>
               <FormMessage />

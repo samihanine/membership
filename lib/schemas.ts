@@ -14,6 +14,7 @@ export const organizationSchema = z.object({
   imageUrl: z.string().optional(),
   imageCardBackUrl: z.string().optional(),
   imageCardFrontUrl: z.string().optional(),
+  formattedAddress: z.string().optional(),
   id: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -22,6 +23,34 @@ export const organizationSchema = z.object({
 
 export type Organization = z.infer<typeof organizationSchema>;
 
+export const commandSchema = z.object({
+  transactionId: z.string(),
+  memberId: z.string(),
+  status: z.enum(["PENDING", "SUCCEEDED", "FAILED"]),
+  id: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  deletedAt: z.date().optional(),
+});
+
+export type Command = z.infer<typeof commandSchema>;
+
+export const transactionSchema = z.object({
+  userId: z.string(),
+  amount: z.number(),
+  currency: z.string().default("EUR"),
+  stripeSessionId: z.string(),
+  stripePaymentIntentId: z.string().optional(),
+  status: z.enum(["PENDING", "SUCCEEDED", "FAILED"]).default("PENDING"),
+  id: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  deletedAt: z.date().optional(),
+  command: commandSchema.nullish(),
+});
+
+export type Transaction = z.infer<typeof transactionSchema>;
+
 export const memberSchema = z.object({
   firstName: z.string().min(2, {
     message: "Le prénom doit faire au moins 2 caractères",
@@ -29,6 +58,8 @@ export const memberSchema = z.object({
   lastName: z.string().optional(),
   phoneNumber: z.string().optional(),
   membershipExpiresAt: z.date().nullish(),
+  isMembershipActive: z.boolean().default(true),
+  formattedAddress: z.string().optional(),
   email: z.string().optional(),
   imageUrl: z.string().optional(),
   note: z.string().default(""),
@@ -37,6 +68,7 @@ export const memberSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().optional(),
+  commands: z.array(commandSchema).optional(),
 });
 
 export type Member = z.infer<typeof memberSchema>;
@@ -96,7 +128,7 @@ export const invitationSchema = z.object({
   organizationId: z.string(),
   role: z.enum(["ADMINISTRATOR"]),
   token: z.string(),
-  accepted: z.boolean().default(false),
+  acceptedAt: z.date().optional(),
   id: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),

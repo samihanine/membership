@@ -23,7 +23,8 @@ export default async function Page() {
         <CardHeader>
           <CardTitle className="text-2xl">Ajouter une organisation</CardTitle>
           <CardDescription>
-            Ajouter une organisation pour commencer à utiliser l'application
+            Ajouter une organisation pour commencer à utiliser l&apos;
+            application
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -31,7 +32,6 @@ export default async function Page() {
             onSuccess={async (organization) => {
               "use server";
 
-              console.log("Organization created", organization);
               redirect(`/organizations/${organization.id}`);
             }}
           />

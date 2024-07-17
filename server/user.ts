@@ -70,7 +70,29 @@ export const createUser = async (data: {
   role: User["role"];
   imageUrl?: string;
 }) => {
-  let hubspotId = undefined;
+  const invitation = await prisma.invitation.findFirst({
+    where: { email: data.email },
+  });
+
+  const user = await prisma.user.create({
+    data: {
+      ...data,
+    },
+  });
+
+  if (invitation) {
+    await prisma.invitation.update({
+      where: { id: invitation.id },
+      data: { acceptedAt: new Date() },
+    });
+
+    await prisma.organizationUser.create({
+      data: {
+        organizationId: invitation.organizationId,
+        userId: user.id,
+      },
+    });
+  }
 
   await sendEmail({
     to: data.email,
@@ -78,10 +100,5 @@ export const createUser = async (data: {
     text: `Bonjour, nous sommes ravis de vous accueillir sur notre plateforme !`,
   });
 
-  return await prisma.user.create({
-    data: {
-      ...data,
-      hubspotId,
-    },
-  });
+  return user;
 };

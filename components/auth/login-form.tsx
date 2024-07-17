@@ -4,15 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import GoogleButton from "./google-button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { loginWithPassword } from "@/server/auth";
-import { useSearchParams } from "next/navigation";
 import { Card } from "../ui/card";
 
 const LoginForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const params = useSearchParams();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,16 +29,6 @@ const LoginForm = () => {
 
     setLoading(false);
   };
-
-  useEffect(() => {
-    const errorParams = params.get("error");
-
-    if (errorParams && !error) {
-      if (errorParams === "google_login_failed") {
-        setError("La connexion avec Google a échoué.");
-      }
-    }
-  }, [params]);
 
   return (
     <div>

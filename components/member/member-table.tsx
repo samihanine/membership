@@ -1,41 +1,64 @@
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "../ui/table";
+"use client";
+
 import { Member } from "@/lib/schemas";
+import { MoreHorizontal } from "lucide-react";
+import Image from "next/image";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
-import Image from "next/image";
-import { MoreHorizontal } from "lucide-react";
-import EditMemberButton from "./edit-member-button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
 import DeleteMemberButton from "./delete-member-button";
-import SubscribeMemberButton from "./subscribe-member-button";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import EditMemberButton from "./edit-member-button";
 
-export default async function MemberTable({ members }: { members: Member[] }) {
+export default function MemberTable({
+  members,
+  selectedMembers,
+  setSelectedMembers,
+}: {
+  members: Member[];
+  selectedMembers: Member[];
+  setSelectedMembers: (members: Member[]) => void;
+}) {
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">
-            <span className="sr-only">Image</span>
+          <TableHead>
+            <Checkbox
+              checked={selectedMembers.length > 0}
+              onClick={() => {
+                if (selectedMembers.length < members.length) {
+                  setSelectedMembers([...members]);
+                } else {
+                  setSelectedMembers([]);
+                }
+              }}
+            />
           </TableHead>
+          <TableHead className="w-[100px]">Photo</TableHead>
           <TableHead>Prénom</TableHead>
           <TableHead>Nom</TableHead>
           <TableHead className="hidden md:table-cell">Email</TableHead>
           <TableHead className="hidden md:table-cell">Phone number</TableHead>
-          <TableHead className="hidden md:table-cell">Expire le</TableHead>
-          <TableHead className="hidden md:table-cell">Ajouté le</TableHead>
+          <TableHead className="hidden md:table-cell">
+            Date d&apos;expiration
+          </TableHead>
+
+          <TableHead className="hidden md:table-cell">Carte</TableHead>
           <TableHead>
             <span className="sr-only">Actions</span>
           </TableHead>
@@ -48,7 +71,27 @@ export default async function MemberTable({ members }: { members: Member[] }) {
               new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
           )
           .map((member) => (
-            <TableRow key={member.id}>
+            <TableRow
+              key={member.id}
+              className={
+                selectedMembers.includes(member) ? "!bg-primary/20" : ""
+              }
+            >
+              <TableCell>
+                <Checkbox
+                  checked={selectedMembers.includes(member)}
+                  onClick={() => {
+                    if (selectedMembers.includes(member)) {
+                      setSelectedMembers(
+                        selectedMembers.filter((m) => m !== member),
+                      );
+                    } else {
+                      setSelectedMembers([...selectedMembers, member]);
+                    }
+                  }}
+                />
+              </TableCell>
+
               <TableCell>
                 <Avatar className="w-11 h-11 text-base">
                   {!!member.imageUrl?.length ? (
@@ -76,18 +119,31 @@ export default async function MemberTable({ members }: { members: Member[] }) {
               </TableCell>
 
               <TableCell className="hidden md:table-cell">
-                <Badge variant="outline">
+                <Badge
+                  variant={member.membershipExpiresAt ? "green" : "outline"}
+                >
                   {member.membershipExpiresAt
                     ? new Date(member.membershipExpiresAt).toLocaleDateString()
                     : "N/A"}
                 </Badge>
               </TableCell>
               <TableCell className="hidden md:table-cell">
-                <Badge variant="outline">
-                  {member.createdAt
-                    ? new Date(member.createdAt).toLocaleDateString()
-                    : "N/A"}
-                </Badge>
+                {!!member.commands?.length && (
+                  <>
+                    {member.commands[0].status === "SUCCEEDED" && (
+                      <Badge variant="green">Succès</Badge>
+                    )}
+                    {member.commands[0].status === "PENDING" && (
+                      <Badge variant="outline">En cours de livraison</Badge>
+                    )}
+                    {member.commands[0].status === "FAILED" && (
+                      <Badge variant="destructive">Echec</Badge>
+                    )}
+                  </>
+                )}
+                {!member.commands?.length && (
+                  <Badge variant="destructive">Aucune</Badge>
+                )}
               </TableCell>
               <TableCell>
                 <DropdownMenu>
@@ -108,10 +164,6 @@ export default async function MemberTable({ members }: { members: Member[] }) {
                     <DeleteMemberButton member={member}>
                       <DropdownMenuLabel>Supprimer</DropdownMenuLabel>
                     </DeleteMemberButton>
-
-                    <SubscribeMemberButton member={member}>
-                      <DropdownMenuLabel>Souscrire</DropdownMenuLabel>
-                    </SubscribeMemberButton>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

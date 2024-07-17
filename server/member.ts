@@ -2,16 +2,19 @@
 
 import prisma from "../lib/prisma";
 import z from "zod";
-import { authActionClient } from "@/lib/safe-action";
+import { actionClient, authActionClient } from "@/lib/safe-action";
 import { memberSchema } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
+import { Member } from "@prisma/client";
 
 export const updateMember = authActionClient
   .schema(memberSchema.partial().extend({ id: z.string() }))
-  .action(async ({ parsedInput: data }) => {
+  .action(async ({ parsedInput }) => {
+    delete parsedInput.commands;
+
     const result = await prisma.member.update({
-      where: { id: data.id },
-      data,
+      where: { id: parsedInput.id },
+      data: parsedInput as Member,
     });
 
     revalidatePath(`/organizations/${result.organizationId}/members`);
@@ -28,12 +31,10 @@ export const createMember = authActionClient
       updatedAt: true,
     }),
   )
-  .action(async ({ parsedInput: data }) => {
-    console.log(data);
+  .action(async ({ parsedInput }) => {
+    delete parsedInput.commands;
     const result = await prisma.member.create({
-      data: {
-        ...data,
-      },
+      data: parsedInput as Member,
     });
 
     revalidatePath(`/organizations/${result.organizationId}/members`);
@@ -58,7 +59,7 @@ export const deleteMember = authActionClient
     return result;
   });
 
-export const getMember = authActionClient
+export const getMember = actionClient
   .schema(z.object({ id: z.string() }))
   .action(async ({ parsedInput: { id } }) => {
     return await prisma.member.findUnique({
@@ -78,4 +79,16 @@ export const getMembers = authActionClient
         deletedAt: null,
       },
     });
+  });
+
+export const subscribeMembers = authActionClient
+  .schema(
+    z.object({
+      organizationId: z.string(),
+      memberIds: z.array(z.string()),
+      subscriptionType: z.enum(["CARD", "EMAIL"]),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    console.log(parsedInput);
   });

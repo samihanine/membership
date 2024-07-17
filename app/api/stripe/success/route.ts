@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
 
   let error: string | undefined = undefined;
   await handlePaymentSuccess(sessionId).catch((e) => {
-    console.error(e);
     error = e;
   });
 

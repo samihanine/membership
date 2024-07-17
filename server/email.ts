@@ -74,7 +74,7 @@ export const sendEmail = async (props: {
     });
 
     const result = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL as string,
+      from: `Membership <${process.env.RESEND_FROM_EMAIL}>`,
       to: props.to,
       subject: props.subject,
       html,

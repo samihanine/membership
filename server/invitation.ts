@@ -27,25 +27,39 @@ export const createInvitation = authActionClient
       throw new Error("Organization not found");
     }
 
-    const invitation = await prisma.invitation.findFirst({
+    const organizationUser = await prisma.organizationUser.findFirst({
+      where: {
+        organizationId,
+        user: {
+          email,
+        },
+      },
+    });
+
+    if (organizationUser) {
+      return {
+        error: "User already in organization",
+        success: false,
+      };
+    }
+
+    let invitation = await prisma.invitation.findFirst({
       where: {
         email,
         organizationId,
       },
     });
 
-    if (invitation) {
-      throw new Error("Invitation already exists");
+    if (!invitation) {
+      invitation = await prisma.invitation.create({
+        data: {
+          email,
+          organizationId,
+          role,
+          token: Math.random().toString(36).substring(2),
+        },
+      });
     }
-
-    const result = await prisma.invitation.create({
-      data: {
-        email,
-        organizationId,
-        role,
-        token: Math.random().toString(36).substring(2),
-      },
-    });
 
     const user = await prisma.user.findFirst({
       where: {
@@ -58,7 +72,7 @@ export const createInvitation = authActionClient
         to: email,
         subject: `Invitation à rejoindre ${organization.name}`,
         text: `Bonjour, vous avez été invité à rejoindre l'organisation ${organization.name}. Cliquez sur le lien suivant pour vous inscrire et rejoindre l'organisation.`,
-        actionUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/regiester?token=${result.token}`,
+        actionUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/regiester?token=${invitation.token}`,
         actionText: "Rejoindre l'organisation",
       });
     } else {
@@ -66,14 +80,17 @@ export const createInvitation = authActionClient
         to: email,
         subject: `Invitation à rejoindre ${organization.name}`,
         text: `Bonjour, vous avez été invité à rejoindre l'organisation ${organization.name}. Cliquez sur le lien suivant pour vous inscrire et rejoindre l'organisation.`,
-        actionUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/regiester?token=${result.token}`,
+        actionUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/regiester?token=${invitation.token}`,
         actionText: "Rejoindre l'organisation",
       });
     }
 
     revalidatePath(`/organizations/${organizationId}/settings/users`);
 
-    return result;
+    return {
+      invitation,
+      success: true,
+    };
   });
 
 export const getInvitations = authActionClient

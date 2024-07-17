@@ -26,8 +26,8 @@ export default function Layout({
       label: "Organisation",
     },
     {
-      href: `/organizations/${params.organizationId}/settings/billing`,
-      label: "Facturation",
+      href: `/organizations/${params.organizationId}/settings/commands`,
+      label: "Historique des commandes",
     },
     {
       href: `/organizations/${params.organizationId}/settings/users`,
@@ -46,7 +46,7 @@ export default function Layout({
       <Card>
         <div className="h-8" />
 
-        <CardContent className="flex gap-12">
+        <CardContent className="flex gap-12 flex-col md:flex-row">
           <nav
             className="flex flex-col gap-2 sm:w-1/5"
             x-chunk="dashboard-04-chunk-0"

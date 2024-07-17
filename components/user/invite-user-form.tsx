@@ -31,6 +31,7 @@ const formSchema = invitationSchema.omit({
   createdAt: true,
   updatedAt: true,
   deletedAt: true,
+  acceptedAt: true,
 });
 
 export function InviteUserForm({
@@ -58,8 +59,10 @@ export function InviteUserForm({
       organizationId,
     });
 
-    if (result?.data?.id) {
-      onSuccess?.(result.data as Invitation);
+    if (result?.data?.error) {
+      return displayError({ message: result.data.error });
+    } else if (result?.data?.invitation) {
+      onSuccess?.(result.data.invitation as Invitation);
     } else {
       displayError({
         message:

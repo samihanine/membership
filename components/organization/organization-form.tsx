@@ -74,7 +74,7 @@ export function OrganizationForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="flex flex-col gap-4">
-          <FormLabel>Logo de l'organisation</FormLabel>
+          <FormLabel>Logo de l&apos;organisation</FormLabel>
 
           <Avatar className="w-20 h-20 text-xl">
             {!!imageUrl?.length && typeof imageUrl === "string" ? (
@@ -103,7 +103,7 @@ export function OrganizationForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nom de l'organisation</FormLabel>
+              <FormLabel>Nom de l&apos;organisation</FormLabel>
               <FormControl>
                 <Input placeholder="ex: Apple Inc." {...field} />
               </FormControl>

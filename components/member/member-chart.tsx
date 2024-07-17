@@ -94,7 +94,7 @@ export default function MemberChart({ members }: { members: Member[] }) {
   }
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>
           <span className="text-xl">Membres</span>

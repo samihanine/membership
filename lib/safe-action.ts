@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/server/user";
-import { createSafeActionClient, type MiddlewareFn } from "next-safe-action";
+import { createSafeActionClient } from "next-safe-action";
 
 export const actionClient = createSafeActionClient();
 
