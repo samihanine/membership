@@ -1,5 +1,4 @@
 import LogOutButton from "@/components/auth/log-out-button";
-import ErrorBanner from "@/components/layout/error-banner";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -57,8 +56,6 @@ export default async function Layout({
           </Link>
         )}
       </Header>
-
-      <ErrorBanner />
 
       <main className="w-full h-full px-5">
         <section className="max-w-7xl w-full mx-auto py-10">{children}</section>
