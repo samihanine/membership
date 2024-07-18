@@ -138,10 +138,12 @@ export const invitationSchema = z.object({
   role: z.enum(["ADMINISTRATOR"]),
   token: z.string(),
   acceptedAt: z.date().optional(),
+  invitedByUserId: z.string(),
   id: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().optional(),
+  user: userSchema.optional(),
 });
 
 export type Invitation = z.infer<typeof invitationSchema>;

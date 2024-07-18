@@ -11,7 +11,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { displayError } from "@/lib/error";
+import { showError } from "@/lib/utils";
 import { registerSchema } from "@/lib/schemas";
 import { signUpWithPassword } from "@/server/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,7 +38,7 @@ const RegisterForm = () => {
     const result = await executeAsync(values);
 
     if (result?.data?.error) {
-      return displayError({ message: result.data.error });
+      return showError({ message: result.data.error });
     }
 
     if (
@@ -46,7 +46,7 @@ const RegisterForm = () => {
       result?.validationErrors ||
       result?.bindArgsValidationErrors
     ) {
-      return displayError({
+      return showError({
         message: "Une erreur s'est produite lors de la création du compte",
       });
     }

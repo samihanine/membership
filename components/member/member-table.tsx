@@ -129,11 +129,11 @@ export default function MemberTable({
                 </Badge>
               </TableCell>
 
-              <TableCell className="hidden md:table-cell">
+              <TableCell>
                 {!!member.commands?.length && (
                   <>
                     {member.commands[0].status === "SUCCEEDED" && (
-                      <Badge variant="green">Succès</Badge>
+                      <Badge variant="green">à une carte</Badge>
                     )}
                     {member.commands[0].status === "PENDING" && (
                       <Badge variant="outline">En cours de livraison</Badge>

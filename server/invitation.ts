@@ -14,9 +14,10 @@ export const createInvitation = authActionClient
       updatedAt: true,
       deletedAt: true,
       token: true,
+      invitedByUserId: true,
     }),
   )
-  .action(async ({ parsedInput: { email, organizationId, role } }) => {
+  .action(async ({ parsedInput: { email, organizationId, role }, ctx }) => {
     const organization = await prisma.organization.findFirst({
       where: {
         id: organizationId,
@@ -24,7 +25,10 @@ export const createInvitation = authActionClient
     });
 
     if (!organization) {
-      throw new Error("Organization not found");
+      return {
+        error: "L'organisation est introuvable",
+        success: false,
+      };
     }
 
     const organizationUser = await prisma.organizationUser.findFirst({
@@ -38,7 +42,7 @@ export const createInvitation = authActionClient
 
     if (organizationUser) {
       return {
-        error: "User already in organization",
+        error: "L'utilisateur est déjà membre de l'organisation",
         success: false,
       };
     }
@@ -56,6 +60,7 @@ export const createInvitation = authActionClient
           email,
           organizationId,
           role,
+          invitedByUserId: ctx.user.id,
           token: Math.random().toString(36).substring(2),
         },
       });
@@ -67,22 +72,30 @@ export const createInvitation = authActionClient
       },
     });
 
-    if (user) {
-      await sendEmail({
-        to: email,
-        subject: `Invitation à rejoindre ${organization.name}`,
-        text: `Bonjour, vous avez été invité à rejoindre l'organisation ${organization.name}. Cliquez sur le lien suivant pour vous inscrire et rejoindre l'organisation.`,
-        actionUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/regiester?token=${invitation.token}`,
-        actionText: "Rejoindre l'organisation",
-      });
-    } else {
-      await sendEmail({
-        to: email,
-        subject: `Invitation à rejoindre ${organization.name}`,
-        text: `Bonjour, vous avez été invité à rejoindre l'organisation ${organization.name}. Cliquez sur le lien suivant pour vous inscrire et rejoindre l'organisation.`,
-        actionUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/regiester?token=${invitation.token}`,
-        actionText: "Rejoindre l'organisation",
-      });
+    try {
+      if (user) {
+        await sendEmail({
+          to: email,
+          subject: `${ctx.user.name} vous a ajouté sur ${organization.name}`,
+          text: `Bonjour, ${ctx.user.name} vous à ajouté sur l'organisation ${organization.name}. Cliquez sur le lien suivant pour vous accéder à l'organisation.`,
+          actionUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/organizations/${organizationId}`,
+          actionText: `Accéder à ${organization.name}`,
+        });
+      } else {
+        await sendEmail({
+          to: email,
+          subject: `${ctx.user.name} vous a invité à rejoindre ${organization.name}`,
+          text: `Bonjour, vous avez été invité à rejoindre l'organisation ${organization.name}. Cliquez sur le lien suivant pour vous inscrire et rejoindre l'organisation.`,
+          actionUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/register?token=${invitation.token}`,
+          actionText: `Rejoindre ${organization.name}`,
+        });
+      }
+    } catch (error) {
+      console.log("error", error);
+      return {
+        error: "Une erreur s'est produite lors de l'envoi de l'email",
+        success: false,
+      };
     }
 
     revalidatePath(`/organizations/${organizationId}/settings/users`);

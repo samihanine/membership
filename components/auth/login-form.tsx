@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import GoogleButton from "./google-button";
 import { loginWithPassword } from "@/server/auth";
-import { displayError } from "@/lib/error";
+import { showError } from "@/lib/utils";
 import { useAction } from "next-safe-action/hooks";
 
 const LoginForm = () => {
@@ -21,7 +21,7 @@ const LoginForm = () => {
     const result = await executeAsync({ email, password });
 
     if (result?.data?.error) {
-      displayError({ message: result?.data?.error });
+      showError({ message: result?.data?.error });
     }
   };
 

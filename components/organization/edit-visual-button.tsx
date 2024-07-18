@@ -16,7 +16,7 @@ import React, { useState } from "react";
 import UploadImageInput from "../upload/upload-image-input";
 import { CARD_HEIGHT, CARD_WIDTH } from "@/lib/contants";
 import Image from "next/image";
-import { displayError } from "@/lib/error";
+import { showError } from "@/lib/utils";
 
 export default function EditVisualButton({
   children,
@@ -48,7 +48,7 @@ export default function EditVisualButton({
     if (result?.data?.id) {
       setOpen(false);
     } else {
-      displayError({
+      showError({
         message: "Une erreur s'est produite lors de la mise à jour de l'image",
       });
     }

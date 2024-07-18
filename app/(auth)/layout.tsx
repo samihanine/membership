@@ -34,9 +34,7 @@ export default async function RootLayout({
     <>
       <div className="flex min-h-screen w-full px-8 py-12">
         <div className="px-5 md:px-20 space-y-8 lg:max-w-lg w-full">
-          <Link href="/">
-            <LogoText />
-          </Link>
+          <LogoText />
 
           {children}
         </div>

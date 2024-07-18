@@ -98,6 +98,8 @@ export const createUser = async (data: {
     to: data.email,
     subject: "Bienvenue sur notre plateforme",
     text: `Bonjour, nous sommes ravis de vous accueillir sur notre plateforme !`,
+    actionText: "Se connecter",
+    actionUrl: (process.env.NEXT_PUBLIC_BASE_URL as string) + "/login",
   });
 
   return user;

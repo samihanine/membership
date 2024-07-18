@@ -14,7 +14,7 @@ import { Member } from "@/lib/schemas";
 import { CreditCardIcon, File } from "lucide-react";
 import { useState } from "react";
 import SubscribeMemberButton from "./subscribe-members-button";
-import { displayError } from "@/lib/error";
+import { showError } from "@/lib/utils";
 
 export default function MembersPage({
   organizationId,
@@ -46,7 +46,7 @@ export default function MembersPage({
             <Button
               variant="outline"
               onClick={() => {
-                displayError({
+                showError({
                   message:
                     "Veuillez d'abord sélectionner des membres pour les abonner",
                 });

@@ -32,12 +32,10 @@ export default function Header({
           "bg-opacity-90 backdrop-blur-md",
         )}
       >
-        <div className="mx-auto px-5 xl:px-0 max-w-7xl">
+        <div className="mx-auto px-5 w-full">
           <div className="relative flex flex-row gap-5 items-center justify-between h-16">
             <div className="relative z-20 flex justify-between w-max">
-              <Link href="/">
-                <LogoText />
-              </Link>
+              <LogoText />
             </div>
 
             {!isMobile && (

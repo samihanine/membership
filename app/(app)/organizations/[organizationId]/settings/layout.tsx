@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function Layout({
   children,
@@ -46,13 +47,6 @@ export default function Layout({
 
   return (
     <>
-      <div className="flex flex-col gap-2 items-center mb-8">
-        <CardTitle>Paramètres</CardTitle>
-        <CardDescription>
-          Gérer et configurer votre organisation
-        </CardDescription>
-      </div>
-
       <div className="flex gap-12 flex-col md:flex-row w-full">
         <nav
           className="flex flex-col gap-2 sm:w-1/5"

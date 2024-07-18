@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { toast } from "sonner";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -32,3 +33,25 @@ export function formatDateForDisplay(date: Date): string {
     day: "numeric",
   });
 }
+
+export const showError = (error: { message: string; code?: string }) => {
+  toast.error(error.message, {
+    dismissible: true,
+    position: "top-center",
+    style: {
+      backgroundColor: "#f44336",
+      color: "#fff",
+    },
+  });
+};
+
+export const showSuccess = (message: string) => {
+  toast.success(message, {
+    dismissible: true,
+    position: "top-center",
+    style: {
+      backgroundColor: "#4caf50",
+      color: "#fff",
+    },
+  });
+};

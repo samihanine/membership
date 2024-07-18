@@ -15,11 +15,11 @@ export const buildHtmlTemplate = (props: {
   <head>
       <title>${props.title}</title>
   </head>
-  <body style="background-color: #f0f0f0; font-family: Arial, sans-serif; color: #333; margin: 0; padding: 20px;">
+  <body style="background-color: #fafafa; font-family: Arial, sans-serif; color: #333; margin: 0; padding: 40px;">
       <table width="100%" cellspacing="0" cellpadding="0">
           <tr>
               <td align="center">
-                  <table width="600px" cellspacing="0" cellpadding="20" style="background-color: #ffffff;">
+                  <table width="600px" cellspacing="0" cellpadding="20" style="background-color: #ffffff; border-radius: 20px">
                       <tr>
                           <td align="center" style="font-size: 24px; font-weight: bold; color: #000000;">
                               ${props.title}
@@ -33,10 +33,10 @@ export const buildHtmlTemplate = (props: {
                       ${
                         props.actionUrl
                           ? `<tr>
-                          <td align="center" style="padding-top: 20px;">
+                          <td align="center" style="padding-top: 20px; padding-bottom: 10px;">
                               <a href="${
                                 props.actionUrl
-                              }" style="background-color: #007bff; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                              }" style="background-color: #f97415; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
                                 ${props.actionText || "Cliquez ici"}
                               </a>
                           </td>
@@ -65,23 +65,21 @@ export const sendEmail = async (props: {
   actionUrl?: string;
   actionText?: string;
 }) => {
-  try {
-    const html = await buildHtmlTemplate({
-      title: props.title || props.subject,
-      content: props.text,
-      actionUrl: props.actionUrl,
-      actionText: props.actionText,
-    });
+  const html = await buildHtmlTemplate({
+    title: props.title || props.subject,
+    content: props.text,
+    actionUrl: props.actionUrl,
+    actionText: props.actionText,
+  });
 
-    const result = await resend.emails.send({
-      from: `Membership <${process.env.RESEND_FROM_EMAIL}>`,
-      to: props.to,
-      subject: props.subject,
-      html,
-    });
+  const result = await resend.emails.send({
+    from: `Membership <${process.env.RESEND_FROM_EMAIL}>`,
+    to: props.to,
+    subject: props.subject,
+    html,
+  });
 
-    console.log(result);
-  } catch (error) {
-    console.error("Erreur lors de l'envoi de l'email", error);
+  if (result.error) {
+    throw new Error(result.error.message);
   }
 };

@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import { googleClient } from "@/lib/google";
 import { createUser } from "./user";
 import { z } from "zod";
-import { actionClient } from "@/lib/safe-action";
+import { actionClient, authActionClient } from "@/lib/safe-action";
 import { registerSchema } from "@/lib/schemas";
 
 const hashPassword = async (password: string): Promise<string> => {
@@ -181,10 +181,10 @@ export const createCookie = async ({ userId }: { userId: string }) => {
   });
 };
 
-export const logOut = async () => {
+export const logOut = authActionClient.action(async () => {
   const cookieStore = cookies();
 
   cookieStore.delete("accessToken");
 
   redirect(`/`);
-};
+});

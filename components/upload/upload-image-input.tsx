@@ -1,7 +1,7 @@
 import { type UploadFile } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 import { useAction } from "next-safe-action/hooks";
-import { displayError } from "../../lib/error";
+import { showError } from "../../lib/utils";
 import { uploadFile } from "../../server/upload";
 import { Input } from "../ui/input";
 
@@ -28,7 +28,7 @@ export default function UploadImageInput({
         if (!file) return;
 
         if (file.size > 3_000_000) {
-          displayError({ message: "L'image ne doit pas dépasser 3Mo" });
+          showError({ message: "L'image ne doit pas dépasser 3Mo" });
           return;
         }
 
@@ -41,7 +41,7 @@ export default function UploadImageInput({
         if (result?.data?.fileUrl) {
           setImageUrl(result.data.fileUrl);
         } else {
-          displayError({
+          showError({
             message: "Une erreur s'est produite lors de l'envoi de l'image",
           });
         }

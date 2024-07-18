@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { displayError } from "@/lib/error";
+import { showError } from "@/lib/utils";
 import { Member, memberSchema } from "@/lib/schemas";
 import { createMember, updateMember } from "@/server/member";
 import { useParams } from "next/navigation";
@@ -74,7 +74,7 @@ export function MemberForm({
     if (result?.data?.id) {
       onSuccess?.(result.data as Member);
     } else {
-      displayError({
+      showError({
         message:
           "Une erreur s'est produite lors de la création de l'organisation",
       });

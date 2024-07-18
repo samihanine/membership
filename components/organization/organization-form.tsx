@@ -10,7 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { displayError } from "@/lib/error";
+import { showError } from "@/lib/utils";
 import { organizationSchema } from "@/lib/schemas";
 import {
   Organization,
@@ -61,7 +61,7 @@ export function OrganizationForm({
     if (result?.data?.id) {
       onSuccess?.(result.data as Organization);
     } else {
-      displayError({
+      showError({
         message:
           "Une erreur s'est produite lors de la création de l'organisation",
       });

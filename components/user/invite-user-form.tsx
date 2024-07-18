@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { displayError } from "@/lib/error";
+import { showError, showSuccess } from "@/lib/utils";
 import { invitationSchema, Invitation } from "@/lib/schemas";
 import { createInvitation } from "@/server/invitation";
 import { useAction } from "next-safe-action/hooks";
@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { toast } from "sonner";
 
 const formSchema = invitationSchema.omit({
   id: true,
@@ -32,6 +33,7 @@ const formSchema = invitationSchema.omit({
   updatedAt: true,
   deletedAt: true,
   acceptedAt: true,
+  invitedByUserId: true,
 });
 
 export function InviteUserForm({
@@ -60,11 +62,12 @@ export function InviteUserForm({
     });
 
     if (result?.data?.error) {
-      return displayError({ message: result.data.error });
+      return showError({ message: result.data.error });
     } else if (result?.data?.invitation) {
+      showSuccess("L'utilisateur a été invité par email avec succès");
       onSuccess?.(result.data.invitation as Invitation);
     } else {
-      displayError({
+      showError({
         message:
           "Une erreur s'est produite lors de l'invitation de l'utilisateur",
       });
