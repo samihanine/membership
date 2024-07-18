@@ -31,14 +31,14 @@ export default function UserDropdown({
         <PopoverTrigger>
           <div
             onClick={() => setOpenPopover(!openPopover)}
-            className="flex items-center gap-3 font-medium"
+            className="flex items-center gap-3 font-medium hover:cursor-pointer text-muted-foreground hover:text-foreground"
           >
             <Avatar className="h-10 w-10 text-xl">
               {imageUrl?.length && <img src={imageUrl} alt={email} />}
 
               {!imageUrl?.length && <AvatarFallback>{name[0]}</AvatarFallback>}
             </Avatar>
-            <p className="capitalize text-muted-foreground">{name}</p>
+            <p className="capitalize">{name}</p>
           </div>
         </PopoverTrigger>
         <PopoverContent className="flex flex-col items-center gap-4">

@@ -1,28 +1,100 @@
+import AddPaymentMethodButton from "@/components/billing/add-payment-method-button";
+import DeletePaymentMethodButton from "@/components/billing/delete-payment-method-button";
+import UpdateDefaultPaymentMethodButton from "@/components/billing/update-default-payment-button";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { PaymentMethod } from "@/lib/schemas";
+import { getPaymentMethods } from "@/server/billing";
 import { getCurrentUser } from "@/server/user";
+import { StarIcon } from "@heroicons/react/20/solid";
+import Image from "next/image";
 import { redirect } from "next/navigation";
-import React from "react";
-import { CardDescription, CardTitle } from "@/components/ui/card";
 
-export default async function Page() {
+export default async function Page({
+  params,
+}: {
+  params: { organizationId: string };
+}) {
   const user = await getCurrentUser();
 
   if (!user) {
     return redirect("/login");
   }
 
+  const paymentMethods = await getPaymentMethods({
+    organizationId: params.organizationId,
+  });
+
   return (
     <>
-      <div>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg mb-1">Facturation</CardTitle>
-            <CardDescription>
-              Gérez vos informations de facturation
-            </CardDescription>
-          </div>
-        </div>
-        <div className="border-b border-border mt-6" />
+      <div className="flex items-center justify-between">
+        <CardTitle className="text-lg mb-1">Moyens de paiement</CardTitle>
+
+        <AddPaymentMethodButton organizationId={params.organizationId} />
       </div>
+
+      {!!paymentMethods?.data?.length && (
+        <div className="flex flex-col gap-5 mt-8 w-full max-w-2xl">
+          {paymentMethods.data.map((paymentMethod) => (
+            <Card key={paymentMethod.id} className="flex flex-col !shadow-none">
+              <CardHeader className="flex justify-between items-center flex-row w-full !pt-0 !pb-2">
+                <div className="flex flex-col gap-1">
+                  <CardTitle className="text-base font-semibold flex items-center">
+                    {paymentMethod.isDefault && (
+                      <StarIcon className="h-4 w-4 text-yellow-400 mr-2" />
+                    )}
+                    {paymentMethod.brand.toLowerCase() === "visa"
+                      ? "Visa"
+                      : "Mastercard"}{" "}
+                    se terminant par {paymentMethod.lastFourDigits}
+                  </CardTitle>
+                  <CardDescription>
+                    Expire le {paymentMethod.expMonth < 10 ? "0" : ""}
+                    {paymentMethod.expMonth}/{paymentMethod.expYear}
+                  </CardDescription>
+                </div>
+
+                {paymentMethod.brand.toLowerCase() === "visa" && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="#1434CB"
+                    viewBox="0 0 24 24"
+                    className="h-20 w-20"
+                  >
+                    <path d="M16.539 9.186a4.155 4.155 0 0 0-1.451-.251c-1.6 0-2.73.806-2.738 1.963-.01.85.803 1.329 1.418 1.613.631.292.842.476.84.737-.004.397-.504.577-.969.577-.639 0-.988-.089-1.525-.312l-.199-.093-.227 1.332c.389.162 1.09.301 1.814.313 1.701 0 2.813-.801 2.826-2.032.014-.679-.426-1.192-1.352-1.616-.563-.275-.912-.459-.912-.738 0-.247.299-.511.924-.511a2.95 2.95 0 0 1 1.213.229l.15.067.227-1.287-.039.009zm4.152-.143h-1.25c-.389 0-.682.107-.852.493l-2.404 5.446h1.701l.34-.893 2.076.002c.049.209.199.891.199.891h1.5l-1.31-5.939zm-10.642-.05h1.621l-1.014 5.942H9.037l1.012-5.944v.002zm-4.115 3.275.168.825 1.584-4.05h1.717l-2.551 5.931H5.139l-1.4-5.022a.339.339 0 0 0-.149-.199 6.948 6.948 0 0 0-1.592-.589l.022-.125h2.609c.354.014.639.125.734.503l.57 2.729v-.003zm12.757.606.646-1.662c-.008.018.133-.343.215-.566l.111.513.375 1.714H18.69v.001h.001z" />
+                  </svg>
+                )}
+              </CardHeader>
+
+              <CardContent className="flex gap-4">
+                <UpdateDefaultPaymentMethodButton
+                  paymentMethod={paymentMethod as PaymentMethod}
+                />
+
+                <DeletePaymentMethodButton
+                  paymentMethod={paymentMethod as PaymentMethod}
+                />
+              </CardContent>
+            </Card>
+          ))}
+
+          {paymentMethods.data.length === 0 && (
+            <Card className="flex flex-col !shadow-none">
+              <CardContent>
+                <CardDescription>
+                  Vous n&apos;avez pas encore ajouté de moyen de paiement.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
     </>
   );
 }

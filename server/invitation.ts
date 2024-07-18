@@ -26,7 +26,7 @@ export const createInvitation = authActionClient
 
     if (!organization) {
       return {
-        error: "L'organisation est introuvable",
+        error: "L'organisation est introuvable.",
         success: false,
       };
     }
@@ -42,7 +42,7 @@ export const createInvitation = authActionClient
 
     if (organizationUser) {
       return {
-        error: "L'utilisateur est déjà membre de l'organisation",
+        error: "L'utilisateur est déjà membre de l'organisation.",
         success: false,
       };
     }
@@ -93,7 +93,7 @@ export const createInvitation = authActionClient
     } catch (error) {
       console.log("error", error);
       return {
-        error: "Une erreur s'est produite lors de l'envoi de l'email",
+        error: "Une erreur s'est produite lors de l'envoi de l'email.",
         success: false,
       };
     }

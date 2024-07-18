@@ -8,7 +8,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Member } from "@/lib/schemas";
-import { subscribeMembers } from "@/server/member";
+import { createOrders } from "@/server/order";
 import { useAction } from "next-safe-action/hooks";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -22,17 +22,12 @@ export default function SubscribeMembersButton({
   members: Member[];
 }) {
   const [open, setOpen] = useState(false);
-  const { executeAsync, status } = useAction(subscribeMembers);
+  const { executeAsync, status } = useAction(createOrders);
   const params = useParams();
 
-  const handleSubmit = async ({
-    subscriptionType,
-  }: {
-    subscriptionType: "CARD" | "EMAIL";
-  }) => {
+  const handleSubmit = async () => {
     await executeAsync({
       memberIds: members.map((member) => member.id),
-      subscriptionType: subscriptionType,
       organizationId: params.organizationId as string,
     });
     setOpen(false);
@@ -59,19 +54,10 @@ export default function SubscribeMembersButton({
           <div className="flex flex-col gap-4">
             <Button
               className="!h-fit"
-              onClick={() => handleSubmit({ subscriptionType: "CARD" })}
+              onClick={() => handleSubmit()}
               disabled={status === "executing"}
             >
-              Envoyer à chacun une carte de membre
-            </Button>
-
-            <Button
-              variant={"outline"}
-              className="!h-fit"
-              onClick={() => handleSubmit({ subscriptionType: "EMAIL" })}
-              disabled={status === "executing"}
-            >
-              Envoyer à chacun un email
+              Livrer à chacun une carte de membre
             </Button>
           </div>
         </SheetHeader>

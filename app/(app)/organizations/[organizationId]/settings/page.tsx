@@ -26,13 +26,8 @@ export default async function Page({
     <>
       <div>
         <CardTitle className="text-lg mb-1">
-          Modifier votre organisation
+          Modifiez votre organisation
         </CardTitle>
-        <CardDescription>
-          Modifier les informations de votre organisation
-        </CardDescription>
-
-        <div className="border-b border-border mt-6" />
       </div>
 
       <div className="mb-6" />

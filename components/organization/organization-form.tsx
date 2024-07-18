@@ -34,10 +34,12 @@ const formSchema = organizationSchema.omit({
 
 export function OrganizationForm({
   organization,
+  email,
   onSuccess,
 }: {
   organization?: Organization;
   onSuccess?: (organization: Organization) => void;
+  email?: string;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,6 +47,7 @@ export function OrganizationForm({
       name: organization?.name ?? "",
       imageUrl: organization?.imageUrl ?? undefined,
       description: organization?.description ?? "",
+      email: organization?.email ?? email ?? "",
     },
   });
   const { executeAsync: createAsync, status: createStatus } =
@@ -63,7 +66,7 @@ export function OrganizationForm({
     } else {
       showError({
         message:
-          "Une erreur s'est produite lors de la création de l'organisation",
+          "Une erreur s'est produite lors de la création de l'organisation.",
       });
     }
   };
@@ -106,6 +109,23 @@ export function OrganizationForm({
               <FormLabel>Nom de l&apos;organisation</FormLabel>
               <FormControl>
                 <Input placeholder="ex: Apple Inc." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email de l&apos;organisation</FormLabel>
+              <FormControl>
+                <Input
+                  type="email"
+                  placeholder="ex: billing@apple.com"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

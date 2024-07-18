@@ -47,7 +47,7 @@ const RegisterForm = () => {
       result?.bindArgsValidationErrors
     ) {
       return showError({
-        message: "Une erreur s'est produite lors de la création du compte",
+        message: "Une erreur s'est produite lors de la création du compte.",
       });
     }
   };

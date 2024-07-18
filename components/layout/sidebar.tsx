@@ -62,8 +62,8 @@ export default function Sidebar({
       )}
     >
       <div className="flex flex-grow flex-col justify-between">
-        <nav className="flex flex-col gap-2 px-5 py-3">
-          <div className="flex items-center gap-2 justify-between">
+        <nav className="flex flex-col gap-2">
+          <div className="flex items-center gap-2 justify-between border-b border-border px-5 py-3">
             <LogoText />
 
             {closeSidebar && (
@@ -73,37 +73,39 @@ export default function Sidebar({
               />
             )}
           </div>
-          <div className="h-2" />
-          <SelectOrganization
-            organizations={organizations}
-            organizationId={organizationId}
-          />
-          <div className="h-2" />
+          <div className="flex flex-col gap-2 px-5 py-3">
+            <SelectOrganization
+              organizations={organizations}
+              organizationId={organizationId}
+            />
 
-          <MenuItem
-            exact
-            href={`/organizations/${organizationId}`}
-            onClick={closeSidebar}
-          >
-            <HomeIcon className="h-5 w-5" /> Dashboard
-          </MenuItem>
+            <div className="h-2" />
 
-          <MenuItem
-            href={`/organizations/${organizationId}/members`}
-            onClick={closeSidebar}
-          >
-            <UserCircleIcon className="h-5 w-5" /> Members
-          </MenuItem>
+            <MenuItem
+              exact
+              href={`/organizations/${organizationId}`}
+              onClick={closeSidebar}
+            >
+              <HomeIcon className="h-5 w-5" /> Tableau de bord
+            </MenuItem>
 
-          <MenuItem
-            href={`/organizations/${organizationId}/settings`}
-            onClick={closeSidebar}
-          >
-            <CogIcon className="h-5 w-5" /> Settings
-          </MenuItem>
+            <MenuItem
+              href={`/organizations/${organizationId}/members`}
+              onClick={closeSidebar}
+            >
+              <UserCircleIcon className="h-5 w-5" /> Membres
+            </MenuItem>
+
+            <MenuItem
+              href={`/organizations/${organizationId}/settings`}
+              onClick={closeSidebar}
+            >
+              <CogIcon className="h-5 w-5" /> Paramètres
+            </MenuItem>
+          </div>
         </nav>
 
-        <div className="flex flex-col gap-2 p-5">
+        <div className="flex flex-col gap-2 p-5 border-t border-border">
           <UserDropdown
             name={user.name}
             email={user.email}

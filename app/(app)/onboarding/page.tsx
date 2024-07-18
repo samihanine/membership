@@ -29,10 +29,11 @@ export default async function Page() {
         </CardHeader>
         <CardContent>
           <OrganizationForm
+            email={user.email}
             onSuccess={async (organization) => {
               "use server";
 
-              redirect(`/organizations/${organization.id}`);
+              redirect(`/organizations/${organization.id}/members`);
             }}
           />
         </CardContent>

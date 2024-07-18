@@ -48,7 +48,7 @@ export default function MembersPage({
               onClick={() => {
                 showError({
                   message:
-                    "Veuillez d'abord sélectionner des membres pour les abonner",
+                    "Veuillez d'abord sélectionner des membres pour leur commander des cartes.",
                 });
               }}
             >

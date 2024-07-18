@@ -29,10 +29,6 @@ export default async function Page({
             <CardTitle className="text-lg mb-1">
               Gérer les accès des utilisateurs
             </CardTitle>
-            <CardDescription>
-              Ajouter ou supprimer des utilisateurs qui ont accès à votre
-              organisation
-            </CardDescription>
           </div>
 
           <InviteUserButton organizationId={params.organizationId} />

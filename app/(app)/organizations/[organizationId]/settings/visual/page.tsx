@@ -57,20 +57,14 @@ export default async function Page({
   ];
 
   return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg mb-1">Visuel des cartes</CardTitle>
-            <CardDescription>
-              Personnalisez le visuel des cartes de vos membres
-            </CardDescription>
-          </div>
-        </div>
-        <div className="border-b border-border mt-6" />
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center">
+        <CardTitle className="text-lg text-center">
+          Modifier le visuel des cartes
+        </CardTitle>
       </div>
 
-      <div className="flex w-full max-w-5xl items-center justify-evenly mx-auto flex-wrap gap-5">
+      <div className="flex w-full flex-wrap gap-5 sm:gap-12">
         {cards.map((card, index) => (
           <Card key={index} className="!shadow-none">
             <CardHeader>

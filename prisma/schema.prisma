@@ -25,7 +25,6 @@ enum UserRole {
 
 model User {
   id               String    @id @default(uuid())
-  hubspotId        String?
   email            String    @unique
   imageUrl         String?
   stripeCustomerId String?
@@ -97,19 +96,22 @@ model Member {
   updatedAt           DateTime     @updatedAt
   deletedAt           DateTime?
 
-  address  Address?  @relation(fields: [addressId], references: [id])
-  commands Command[]
+  address Address? @relation(fields: [addressId], references: [id])
+  orders  Order[]
 }
 
 model Organization {
   id                String  @id @default(uuid())
   name              String
+  email             String
   addressId         String?
   description       String?
   imageUrl          String?
   imageCardBackUrl  String?
   imageCardFrontUrl String?
   formattedAddress  String?
+
+  stripeCustomerId String?
 
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
@@ -118,6 +120,7 @@ model Organization {
   organizationUsers OrganizationUser[]
   members           Member[]
   invitations       Invitation[]
+  paymentMethods    PaymentMethod[]
 }
 
 model Address {
@@ -158,25 +161,48 @@ model Transaction {
   updatedAt             DateTime          @updatedAt
   deletedAt             DateTime?
 
-  command Command?
+  orders Order[]
 }
 
-enum CommandStatus {
+enum OrderStatus {
   PENDING
   SUCCEEDED
   FAILED
 }
 
-model Command {
-  id            String        @id @default(uuid())
-  transactionId String        @unique
+model Order {
+  id            String      @id @default(uuid())
+  transactionId String?
   memberId      String
-  status        CommandStatus @default(PENDING)
+  status        OrderStatus @default(PENDING)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  transaction Transaction @relation(fields: [transactionId], references: [id])
-  member      Member      @relation(fields: [memberId], references: [id])
+  transaction Transaction? @relation(fields: [transactionId], references: [id])
+  member      Member       @relation(fields: [memberId], references: [id])
+}
+
+model PaymentMethod {
+  id                    String  @id @default(uuid())
+  organizationId        String
+  stripePaymentMethodId String
+  lastFourDigits        String
+  expMonth              Int
+  expYear               Int
+  isDefault             Boolean @default(true)
+  brand                 String  @default("visa")
+  country               String  @default("FR")
+  name                  String?
+  email                 String?
+  phoneNumber           String?
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([stripePaymentMethodId])
 }

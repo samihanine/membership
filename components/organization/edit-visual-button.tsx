@@ -49,7 +49,7 @@ export default function EditVisualButton({
       setOpen(false);
     } else {
       showError({
-        message: "Une erreur s'est produite lors de la mise à jour de l'image",
+        message: "Une erreur s'est produite lors de la mise à jour de l'image.",
       });
     }
   };

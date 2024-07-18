@@ -76,7 +76,7 @@ export function MemberForm({
     } else {
       showError({
         message:
-          "Une erreur s'est produite lors de la création de l'organisation",
+          "Une erreur s'est produite lors de la création de l'organisation.",
       });
     }
   };

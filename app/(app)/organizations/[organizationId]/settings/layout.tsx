@@ -32,12 +32,12 @@ export default function Layout({
       label: "Visuel des cartes",
     },
     {
-      href: `/organizations/${params.organizationId}/settings/billing`,
-      label: "Facturation",
+      href: `/organizations/${params.organizationId}/settings/commands`,
+      label: "Commandes",
     },
     {
-      href: `/organizations/${params.organizationId}/settings/commands`,
-      label: "Historique des commandes",
+      href: `/organizations/${params.organizationId}/settings/billing`,
+      label: "Moyens de paiement",
     },
     {
       href: `/organizations/${params.organizationId}/settings/users`,
@@ -47,28 +47,32 @@ export default function Layout({
 
   return (
     <>
-      <div className="flex gap-12 flex-col md:flex-row w-full">
-        <nav
-          className="flex flex-col gap-2 sm:w-1/5"
-          x-chunk="dashboard-04-chunk-0"
-        >
-          {links.map(({ href, label }) => (
-            <Link key={href} href={href}>
-              <div
-                className={cn(
-                  "w-full text-sm whitespace-nowrap text-foreground font-bold hover:underline rounded-md p-2",
-                  pathname === href
-                    ? "bg-muted-foreground/15 hover:!no-underline"
-                    : "",
-                )}
-              >
-                {label}
-              </div>
-            </Link>
-          ))}
-        </nav>
-        <Card className="flex-1 pt-5">
-          <CardContent>{children}</CardContent>
+      <div className="flex items-center flex-wrap gap-5 justify-between w-full">
+        <div className="flex flex-col gap-2">
+          <CardTitle>Paramètres</CardTitle>
+          <CardDescription>
+            Configurer les paramètres de votre organisation
+          </CardDescription>
+        </div>
+      </div>
+      <div className="flex gap-8 flex-col w-full">
+        <nav className="flex" x-chunk="dashboard-04-chunk-0"></nav>
+        <Card className="flex-1 !p-0">
+          <CardHeader className="flex flex-col md:!flex-row md:items-end border-b border-border md:!pt-3 md:!pb-0">
+            {links.map(({ href, label }) => (
+              <Link key={href} href={href}>
+                <div
+                  className={cn(
+                    "w-full text-sm md:border-b-2 border-transparent whitespace-nowrap relative pb-2 text-muted-foreground hover:text-primary font-bold px-4 py-3",
+                    pathname === href ? "border-primary text-primary" : "",
+                  )}
+                >
+                  {label}
+                </div>
+              </Link>
+            ))}
+          </CardHeader>
+          <CardContent className="pt-8">{children}</CardContent>
         </Card>
       </div>
     </>

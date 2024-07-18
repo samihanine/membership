@@ -33,7 +33,7 @@ export const buildHtmlTemplate = (props: {
                       ${
                         props.actionUrl
                           ? `<tr>
-                          <td align="center" style="padding-top: 20px; padding-bottom: 10px;">
+                          <td align="center" style="padding-top: 20px;">
                               <a href="${
                                 props.actionUrl
                               }" style="background-color: #f97415; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">

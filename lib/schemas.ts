@@ -15,6 +15,7 @@ export const organizationSchema = z.object({
   imageCardBackUrl: z.string().optional(),
   imageCardFrontUrl: z.string().optional(),
   formattedAddress: z.string().optional(),
+  email: z.string().email(),
   id: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -23,7 +24,7 @@ export const organizationSchema = z.object({
 
 export type Organization = z.infer<typeof organizationSchema>;
 
-export const commandSchema = z.object({
+export const orderSchema = z.object({
   transactionId: z.string(),
   memberId: z.string(),
   status: z.enum(["PENDING", "SUCCEEDED", "FAILED"]),
@@ -33,7 +34,7 @@ export const commandSchema = z.object({
   deletedAt: z.date().optional(),
 });
 
-export type Command = z.infer<typeof commandSchema>;
+export type Order = z.infer<typeof orderSchema>;
 
 export const transactionSchema = z.object({
   userId: z.string(),
@@ -46,7 +47,7 @@ export const transactionSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().optional(),
-  command: commandSchema.nullish(),
+  order: orderSchema.nullish(),
 });
 
 export type Transaction = z.infer<typeof transactionSchema>;
@@ -68,7 +69,7 @@ export const memberSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().optional(),
-  commands: z.array(commandSchema).optional(),
+  orders: z.array(orderSchema).optional(),
 });
 
 export type Member = z.infer<typeof memberSchema>;
@@ -147,3 +148,23 @@ export const invitationSchema = z.object({
 });
 
 export type Invitation = z.infer<typeof invitationSchema>;
+
+export const paymentMethodSchema = z.object({
+  organizationId: z.string(),
+  stripePaymentMethodId: z.string(),
+  lastFourDigits: z.string(),
+  expMonth: z.number(),
+  expYear: z.number(),
+  isDefault: z.boolean().default(true),
+  brand: z.enum(["visa", "mastercard"]).default("visa"),
+  country: z.string().default("FR"),
+  name: z.string().optional(),
+  email: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  id: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  deletedAt: z.date().optional(),
+});
+
+export type PaymentMethod = z.infer<typeof paymentMethodSchema>;

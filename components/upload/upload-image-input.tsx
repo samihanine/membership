@@ -28,7 +28,7 @@ export default function UploadImageInput({
         if (!file) return;
 
         if (file.size > 3_000_000) {
-          showError({ message: "L'image ne doit pas dépasser 3Mo" });
+          showError({ message: "L'image ne doit pas dépasser 3Mo." });
           return;
         }
 
@@ -42,7 +42,7 @@ export default function UploadImageInput({
           setImageUrl(result.data.fileUrl);
         } else {
           showError({
-            message: "Une erreur s'est produite lors de l'envoi de l'image",
+            message: "Une erreur s'est produite lors de l'envoi de l'image.",
           });
         }
       }}

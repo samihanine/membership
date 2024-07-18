@@ -59,7 +59,7 @@ export default function MemberTable({
             Date d&apos;expiration
           </TableHead>
 
-          <TableHead>Commander</TableHead>
+          <TableHead>Orderer</TableHead>
           <TableHead>
             <span className="sr-only">Actions</span>
           </TableHead>
@@ -130,23 +130,23 @@ export default function MemberTable({
               </TableCell>
 
               <TableCell>
-                {!!member.commands?.length && (
+                {!!member.orders?.length && (
                   <>
-                    {member.commands[0].status === "SUCCEEDED" && (
+                    {member.orders[0].status === "SUCCEEDED" && (
                       <Badge variant="green">à une carte</Badge>
                     )}
-                    {member.commands[0].status === "PENDING" && (
+                    {member.orders[0].status === "PENDING" && (
                       <Badge variant="outline">En cours de livraison</Badge>
                     )}
-                    {member.commands[0].status === "FAILED" && (
+                    {member.orders[0].status === "FAILED" && (
                       <Badge variant="destructive">Echec</Badge>
                     )}
                   </>
                 )}
-                {!member.commands?.length && (
+                {!member.orders?.length && (
                   <SubscribeMembersButton members={[member]}>
                     <Button variant="outline" size="sm">
-                      Commander
+                      Orderer
                     </Button>
                   </SubscribeMembersButton>
                 )}

@@ -20,6 +20,7 @@ export default function SelectOrganization({
   organizationId: string;
 }) {
   const router = useRouter();
+
   return (
     <Select
       onValueChange={(id) => {
@@ -55,7 +56,7 @@ export default function SelectOrganization({
 
         <Link href="/onboarding">
           <Button variant={"outline"} className="m-2">
-            Ajouter
+            Ajouter une organisation
           </Button>
         </Link>
       </SelectContent>
