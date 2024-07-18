@@ -169,6 +169,7 @@ export const deletePaymentMethod = authActionClient
         where: {
           organizationId: paymentMethod.organizationId,
           deletedAt: null,
+          isDefault: false,
         },
       });
 
