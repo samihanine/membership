@@ -1,4 +1,5 @@
 import { handlePaymentSuccess } from "@/server/billing";
+import { redirect } from "next/navigation";
 import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -22,7 +23,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(process.env.NEXT_PUBLIC_BASE_URL + "/");
   }
 
-  return NextResponse.redirect(
-    (process.env.NEXT_PUBLIC_BASE_URL as string) + path,
-  );
+  redirect(path as string);
 }

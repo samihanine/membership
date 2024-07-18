@@ -199,8 +199,21 @@ export const updateDefaultPaymentMethod = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
+    const paymentMethod = await prisma.paymentMethod.findUnique({
+      where: { id: parsedInput.id },
+    });
+
+    if (!paymentMethod) {
+      return {
+        error: {
+          message: "Méthode de paiement introuvable.",
+          code: "PAYMENT_METHOD_NOT_FOUND",
+        },
+      };
+    }
+
     await prisma.paymentMethod.updateMany({
-      where: { organizationId: parsedInput.id },
+      where: { organizationId: paymentMethod.organizationId },
       data: { isDefault: false },
     });
 
