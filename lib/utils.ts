@@ -45,7 +45,7 @@ export const showError = (error: { message: string; code?: string }) => {
   });
 };
 
-export const showSuccess = (message: string) => {
+export const showSuccess = ({ message }: { message: string }) => {
   toast.success(message, {
     dismissible: true,
     position: "top-center",

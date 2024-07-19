@@ -7,20 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  MEMBER
-  OWNER
-}
-
 enum Provider {
   PASSWORD
   GOOGLE
 }
 
 enum UserRole {
-  CUSTOMER
-  ADMIN
-  DRIVER
+  ADMINISTRATOR
+  USER
 }
 
 model User {
@@ -31,7 +25,7 @@ model User {
   name             String
   password         String?
   provider         Provider  @default(PASSWORD)
-  role             Role      @default(OWNER)
+  role             UserRole  @default(USER)
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   deletedAt        DateTime?

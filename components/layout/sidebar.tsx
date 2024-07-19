@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 import UserDropdown from "../user/user-dropdown";
 import { LogoText } from "../ui/logo-text";
 import { XIcon } from "lucide-react";
+import ThemeToggle from "./theme-toggle";
+import { Button } from "../ui/button";
 
 const MenuItem: React.FC<{
   children: React.ReactNode;
@@ -66,12 +68,18 @@ export default function Sidebar({
           <div className="flex items-center gap-2 justify-between border-b border-border px-5 py-3">
             <LogoText />
 
-            {closeSidebar && (
-              <XIcon
-                className="w-6 h-6 text-foreground cursor-pointer"
-                onClick={closeSidebar}
-              />
-            )}
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+
+              {closeSidebar && (
+                <button onClick={closeSidebar} aria-label="Fermer le menu">
+                  <XIcon
+                    className="w-6 h-6 text-foreground cursor-pointer hover:text-primary transition-colors
+                  "
+                  />
+                </button>
+              )}
+            </div>
           </div>
           <div className="flex flex-col gap-2 px-5 py-3">
             <SelectOrganization
@@ -106,11 +114,7 @@ export default function Sidebar({
         </nav>
 
         <div className="flex flex-col gap-2 p-5 border-t border-border">
-          <UserDropdown
-            name={user.name}
-            email={user.email}
-            imageUrl={user.imageUrl}
-          />
+          <UserDropdown user={user} />
         </div>
       </div>
     </div>

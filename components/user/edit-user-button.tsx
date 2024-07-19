@@ -8,39 +8,45 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, UserIcon } from "lucide-react";
 import React, { useState } from "react";
 import { InviteUserForm } from "./invite-user-form";
+import { showSuccess } from "@/lib/utils";
+import { UserForm } from "./user-form";
+import { User } from "@/lib/schemas";
 
-export default function InviteUserButton({
+export default function EditUserButton({
   children,
-  organizationId,
+  user,
 }: {
   children?: React.ReactNode;
-  organizationId: string;
+  user: User;
 }) {
   const [open, setOpen] = useState(false);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger>
+      <SheetTrigger asChild>
         {children ?? (
-          <Button className="gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sm:whitespace-nowrap">Inviter un utilisateur</span>
+          <Button className="gap-1 !w-full">
+            <UserIcon className="h-3.5 w-3.5" />
+            <span className="sm:whitespace-nowrap">Mon compte</span>
           </Button>
         )}
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Inviter un utilisateur</SheetTitle>
+          <SheetTitle>Modifier mon compte</SheetTitle>
           <SheetDescription>
-            Inviter un utilisateur qui aura accès à votre organisation
+            Modifier les informations de mon compte
           </SheetDescription>
           <div className="h-2" />
-          <InviteUserForm
-            organizationId={organizationId}
+          <UserForm
+            user={user}
             onSuccess={() => {
+              showSuccess({
+                message: "Vos informations ont été mises à jour.",
+              });
               setOpen(false);
             }}
           />

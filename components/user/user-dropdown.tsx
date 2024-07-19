@@ -12,45 +12,44 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Image from "next/image";
 import { logOut } from "@/server/auth";
 import { useAction } from "next-safe-action/hooks";
+import { User } from "@/lib/schemas";
+import EditUserButton from "./edit-user-button";
 
-export default function UserDropdown({
-  email,
-  imageUrl,
-  name,
-}: {
-  email: string;
-  name: string;
-  imageUrl?: string;
-}) {
+export default function UserDropdown({ user }: { user: User }) {
   const [openPopover, setOpenPopover] = useState(false);
   const { executeAsync, status } = useAction(logOut);
 
   return (
     <>
       <Popover>
-        <PopoverTrigger>
+        <PopoverTrigger asChild>
           <div
             onClick={() => setOpenPopover(!openPopover)}
             className="flex items-center gap-3 font-medium hover:cursor-pointer text-muted-foreground hover:text-foreground"
           >
             <Avatar className="h-10 w-10 text-xl">
-              {imageUrl?.length && <img src={imageUrl} alt={email} />}
+              {user.imageUrl?.length && (
+                <img src={user.imageUrl} alt={user.email} />
+              )}
 
-              {!imageUrl?.length && <AvatarFallback>{name[0]}</AvatarFallback>}
+              {!user.imageUrl?.length && (
+                <AvatarFallback>{user.name[0]}</AvatarFallback>
+              )}
             </Avatar>
-            <p className="capitalize">{name}</p>
+            <p className="capitalize">{user.name}</p>
           </div>
         </PopoverTrigger>
         <PopoverContent className="flex flex-col items-center gap-4">
-          <p className="text-sm font-medium text-muted-foreground">{email}</p>
+          <EditUserButton user={user} />
           <Button
-            variant={"destructive"}
+            variant={"outline"}
             disabled={status === "executing"}
+            className="w-full"
             onClick={() => {
               executeAsync();
             }}
           >
-            <LogOut className="mr-2 h-4 w-4" />
+            <LogOut className="mr-2 h-4 w-4 text-red-500" />
             <p className="text-sm">Se déconnecter</p>
           </Button>
         </PopoverContent>

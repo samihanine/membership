@@ -26,6 +26,8 @@ export const uploadFile = authActionClient
             return "/images/member-profile-pictures";
           case "USER_PROFILE_PICTURES":
             return "/images/user-profile-pictures";
+          case "ORGANIZATION_LOGOS":
+            return "/images/organization-logos";
           case "CARD_IMAGES":
             return "/images/cards";
           case "OTHER":

@@ -1,14 +1,16 @@
 "use server";
+import { googleClient } from "@/lib/google";
+import { actionClient, authActionClient } from "@/lib/safe-action";
+import { registerSchema, userSchema } from "@/lib/schemas";
 import bcrypt from "bcrypt";
-import prisma from "../lib/prisma";
-import { redirect } from "next/navigation";
 import jsonwebtoken from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { googleClient } from "@/lib/google";
-import { createUser } from "./user";
+import { redirect } from "next/navigation";
 import { z } from "zod";
-import { actionClient, authActionClient } from "@/lib/safe-action";
-import { registerSchema } from "@/lib/schemas";
+import prisma from "../lib/prisma";
+import { sendEmail } from "./email";
+import { getCurrentUser } from "./user";
+import { revalidatePath } from "next/cache";
 
 const hashPassword = async (password: string): Promise<string> => {
   try {
@@ -121,9 +123,13 @@ export const handleGoogleCallback = async ({
       email: data.email,
       name: data.name || "",
       provider: "GOOGLE",
-      role: "OWNER",
+      role: "USER",
       imageUrl: data.picture,
     });
+
+    if (!newUser?.id) {
+      throw new Error("Error creating user");
+    }
 
     await createCookie({ userId: newUser.id });
   } else {
@@ -159,8 +165,14 @@ export const signUpWithPassword = actionClient
       name,
       password: hash,
       provider: "PASSWORD",
-      role: "OWNER",
+      role: "USER",
     });
+
+    if (!newUser) {
+      return {
+        error: "Une erreur s'est produite lors de la création de l'utilisateur",
+      };
+    }
 
     await createCookie({ userId: newUser.id });
 
@@ -188,3 +200,101 @@ export const logOut = authActionClient.action(async () => {
 
   redirect(`/`);
 });
+
+export const updateCurrentUser = async (data: {
+  name?: string;
+  phoneNumber?: string;
+  email?: string;
+  imageUrl?: string;
+}) => {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return null;
+  }
+
+  return await prisma.user.update({
+    where: { id: user.id },
+    data,
+  });
+};
+
+const createUser = async (data: {
+  email: string;
+  name: string;
+  password?: string;
+  provider: "PASSWORD" | "GOOGLE";
+  role: "USER" | "ADMINISTRATOR";
+  imageUrl?: string;
+}) => {
+  const invitation = await prisma.invitation.findFirst({
+    where: { email: data.email },
+  });
+
+  const user = await prisma.user.create({
+    data: {
+      ...data,
+    },
+  });
+
+  if (invitation) {
+    await prisma.invitation.update({
+      where: { id: invitation.id },
+      data: { acceptedAt: new Date() },
+    });
+
+    await prisma.organizationUser.create({
+      data: {
+        organizationId: invitation.organizationId,
+        userId: user.id,
+      },
+    });
+  }
+
+  await sendEmail({
+    to: data.email,
+    subject: "Bienvenue sur notre plateforme",
+    text: `Bonjour, nous sommes ravis de vous accueillir sur notre plateforme !`,
+    actionText: "Se connecter",
+    actionUrl: (process.env.NEXT_PUBLIC_BASE_URL as string) + "/login",
+  });
+
+  return user;
+};
+
+export const updateUser = authActionClient
+  .schema(
+    userSchema
+      .partial()
+      .extend({
+        id: z.string(),
+      })
+      .omit({
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+      }),
+  )
+  .action(async ({ parsedInput }) => {
+    console.log(parsedInput);
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return null;
+    }
+
+    const result = await prisma.user
+      .update({
+        where: { id: user.id },
+        data: parsedInput,
+      })
+      .catch((error) => {
+        console.error("Error updating user:", error);
+        return null;
+      });
+
+    revalidatePath("/");
+
+    return result;
+  });

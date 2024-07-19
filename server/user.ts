@@ -4,8 +4,8 @@ import { cookies } from "next/headers";
 import prisma from "../lib/prisma";
 import { User } from "@prisma/client";
 import { authActionClient } from "@/lib/safe-action";
-import { z } from "zod";
 import { sendEmail } from "./email";
+import { userSchema } from "@/lib/schemas";
 
 export const getCurrentUser = async () => {
   const cookieStore = cookies();
@@ -41,66 +41,4 @@ export const getCurrentUser = async () => {
   });
 
   return user || null;
-};
-
-export const updateCurrentUser = async (data: {
-  name?: string;
-  phoneNumber?: string;
-  email?: string;
-  imageUrl?: string;
-}) => {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return null;
-  }
-
-  return await prisma.user.update({
-    where: { id: user.id },
-    data,
-  });
-};
-
-export const createUser = async (data: {
-  name: string;
-  phoneNumber?: string;
-  email: string;
-  password?: string;
-  provider: User["provider"];
-  role: User["role"];
-  imageUrl?: string;
-}) => {
-  const invitation = await prisma.invitation.findFirst({
-    where: { email: data.email },
-  });
-
-  const user = await prisma.user.create({
-    data: {
-      ...data,
-    },
-  });
-
-  if (invitation) {
-    await prisma.invitation.update({
-      where: { id: invitation.id },
-      data: { acceptedAt: new Date() },
-    });
-
-    await prisma.organizationUser.create({
-      data: {
-        organizationId: invitation.organizationId,
-        userId: user.id,
-      },
-    });
-  }
-
-  await sendEmail({
-    to: data.email,
-    subject: "Bienvenue sur notre plateforme",
-    text: `Bonjour, nous sommes ravis de vous accueillir sur notre plateforme !`,
-    actionText: "Se connecter",
-    actionUrl: (process.env.NEXT_PUBLIC_BASE_URL as string) + "/login",
-  });
-
-  return user;
 };

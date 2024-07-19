@@ -5,6 +5,7 @@ import { useState } from "react";
 import React from "react";
 import Sidebar from "@/components/layout/sidebar";
 import { Organization, User } from "@/lib/schemas";
+import { createPortal } from "react-dom";
 
 export default function OpenSidebarButton({
   organizationId,
@@ -19,21 +20,24 @@ export default function OpenSidebarButton({
 
   return (
     <>
-      <HamburgerMenuIcon
-        className="w-6 h-6 cursor-pointer"
-        onClick={() => setOpen(true)}
-      />
-
+      <button onClick={() => setOpen(true)}>
+        <HamburgerMenuIcon className="w-6 h-6 cursor-pointer hover:text-primary" />
+      </button>
       {open && (
-        <div className="fixed inset-0 bg-card bg-opacity-50 z-[99999]">
-          <Sidebar
-            className="w-full !border-b-0 h-full"
-            organizationId={organizationId}
-            organizations={organizations}
-            user={user as User}
-            closeSidebar={() => setOpen(false)}
-          />
-        </div>
+        <>
+          {createPortal(
+            <div className="fixed inset-0">
+              <Sidebar
+                className="w-full h-screen border-b-0 bg-card"
+                organizationId={organizationId}
+                organizations={organizations}
+                user={user as User}
+                closeSidebar={() => setOpen(false)}
+              />
+            </div>,
+            document.body,
+          )}
+        </>
       )}
     </>
   );

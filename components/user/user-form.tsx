@@ -10,63 +10,52 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { User, userSchema } from "@/lib/schemas";
 import { showError } from "@/lib/utils";
-import { organizationSchema } from "@/lib/schemas";
-import {
-  Organization,
-  createOrganization,
-  updateOrganization,
-} from "@/server/organization";
+import { updateUser } from "@/server/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import UploadImageInput from "../upload/upload-image-input";
-import { Textarea } from "../ui/textarea";
-const formSchema = organizationSchema.omit({
-  id: true,
+
+const formSchema = userSchema.partial().omit({
   createdAt: true,
   updatedAt: true,
   deletedAt: true,
 });
 
-export function OrganizationForm({
-  organization,
-  email,
+export function UserForm({
+  user,
   onSuccess,
 }: {
-  organization?: Organization;
-  onSuccess?: (organization: Organization) => void;
-  email?: string;
+  user: User;
+  onSuccess?: (user: User) => void;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: organization?.name ?? "",
-      imageUrl: organization?.imageUrl ?? undefined,
-      description: organization?.description ?? "",
-      email: organization?.email ?? email ?? "",
+      name: user?.name ?? "",
+      imageUrl: user?.imageUrl ?? undefined,
+      email: user?.email ?? "",
     },
   });
-  const { executeAsync: createAsync, status: createStatus } =
-    useAction(createOrganization);
 
   const { executeAsync: updateAsync, status: updateStatus } =
-    useAction(updateOrganization);
+    useAction(updateUser);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const result = organization
-      ? await updateAsync({ ...values, id: organization.id })
-      : await createAsync(values);
+    console.log("values", values);
+    const result = await updateAsync({ ...user, ...values, id: user.id });
 
+    console.log("result", result);
     if (result?.data?.id) {
-      onSuccess?.(result.data as Organization);
+      onSuccess?.(result.data as User);
     } else {
       showError({
         message:
-          "Une erreur s'est produite lors de la création de l'organisation.",
+          "Une erreur s'est produite lors de la mise à jour de l'utilisateur.",
       });
     }
   };
@@ -77,11 +66,11 @@ export function OrganizationForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="flex flex-col gap-4">
-          <FormLabel>Logo de l&apos;organisation</FormLabel>
+          <FormLabel>Image</FormLabel>
 
           <Avatar className="w-20 h-20 text-xl">
             {!!imageUrl?.length && typeof imageUrl === "string" ? (
-              <Image
+              <img
                 src={form.getValues("imageUrl") as string}
                 alt="Avatar"
                 width={44}
@@ -89,12 +78,14 @@ export function OrganizationForm({
                 className="!w-full object-cover"
               />
             ) : (
-              <AvatarFallback>{form.getValues("name")[0] || ""}</AvatarFallback>
+              <AvatarFallback>
+                {form.getValues("name")?.[0] || ""}
+              </AvatarFallback>
             )}
           </Avatar>
 
           <UploadImageInput
-            folder="ORGANIZATION_LOGOS"
+            folder="USER_PROFILE_PICTURES"
             setImageUrl={(url) => {
               form.setValue("imageUrl", url);
               form.trigger("imageUrl");
@@ -106,9 +97,9 @@ export function OrganizationForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nom de l&apos;organisation</FormLabel>
+              <FormLabel>Prénom et nom</FormLabel>
               <FormControl>
-                <Input placeholder="ex: Apple Inc." {...field} />
+                <Input placeholder="ex: John Doe" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -119,27 +110,11 @@ export function OrganizationForm({
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email de l&apos;organisation</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="ex: billing@apple.com"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="ex: Apple Inc. est une organisation américaine spécialisée dans les technologies informatiques."
+                  placeholder="ex: john@apple.com"
                   {...field}
                 />
               </FormControl>
@@ -148,13 +123,8 @@ export function OrganizationForm({
           )}
         />
         <div className="flex justify-end">
-          <Button
-            type="submit"
-            disabled={
-              createStatus === "executing" || updateStatus === "executing"
-            }
-          >
-            {organization ? "Mettre à jour" : "Créer"}
+          <Button type="submit" disabled={updateStatus === "executing"}>
+            Mettre à jour
           </Button>
         </div>
       </form>

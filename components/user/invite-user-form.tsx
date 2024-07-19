@@ -64,7 +64,10 @@ export function InviteUserForm({
     if (result?.data?.error) {
       return showError({ message: result.data.error });
     } else if (result?.data?.invitation) {
-      showSuccess("L'utilisateur a été invité par email avec succès.");
+      showSuccess({
+        message: "L'utilisateur a été invité par email avec succès.",
+      });
+
       onSuccess?.(result.data.invitation as Invitation);
     } else {
       showError({
