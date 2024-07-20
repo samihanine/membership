@@ -1,6 +1,6 @@
 import MembersPage from "@/components/member/members-page";
 import { Member, PaymentMethod } from "@/lib/schemas";
-import { getPaymentMethods } from "@/server/billing";
+import { getPaymentMethods } from "@/server/payment-method";
 import { getMembers } from "@/server/member";
 import { getCurrentUser } from "@/server/user";
 import { redirect } from "next/navigation";

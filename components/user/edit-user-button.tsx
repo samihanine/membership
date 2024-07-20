@@ -8,12 +8,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { PlusCircle, UserIcon } from "lucide-react";
-import React, { useState } from "react";
-import { InviteUserForm } from "./invite-user-form";
-import { showSuccess } from "@/lib/utils";
-import { UserForm } from "./user-form";
 import { User } from "@/lib/schemas";
+import { showSuccess } from "@/lib/utils";
+import { UserIcon } from "lucide-react";
+import React, { useState } from "react";
+import { UserForm } from "./user-form";
 
 export default function EditUserButton({
   children,

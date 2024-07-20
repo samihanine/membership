@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PaymentMethod } from "@/lib/schemas";
-import { getPaymentMethods } from "@/server/billing";
+import { getPaymentMethods } from "@/server/payment-method";
 import { getOrganization } from "@/server/organization";
 import { getCurrentUser } from "@/server/user";
 import { StarIcon } from "@heroicons/react/20/solid";

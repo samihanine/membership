@@ -126,7 +126,7 @@ export const uploadFileSchema = zfd.formData({
     "ORGANIZATION_LOGOS",
     "OTHER",
   ]),
-  file: zfd.file(),
+  file: z.any(),
 });
 
 export type UploadFile = z.infer<typeof uploadFileSchema>;

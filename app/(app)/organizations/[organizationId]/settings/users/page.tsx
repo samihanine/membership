@@ -1,11 +1,10 @@
-import { CardDescription, CardTitle } from "@/components/ui/card";
+import { CardTitle } from "@/components/ui/card";
 import InviteUserButton from "@/components/user/invite-user-button";
+import OrganizationUserTable from "@/components/user/organization-user-table";
+import { OrganizationUser } from "@/lib/schemas";
+import { getOrganizationUsers } from "@/server/organization-user";
 import { getCurrentUser } from "@/server/user";
 import { redirect } from "next/navigation";
-import React from "react";
-import OrganizationUserTable from "@/components/user/organization-user-table";
-import { getOrganizationUsers } from "@/server/organization-user";
-import { OrganizationUser } from "@/lib/schemas";
 
 export default async function Page({
   params,

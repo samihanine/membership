@@ -1,6 +1,5 @@
-import { LogoText } from "@/components/ui/logo-text";
 import AuthCarousel from "@/components/auth/auth-carousel";
-import Link from "next/link";
+import { LogoText } from "@/components/ui/logo-text";
 
 export default async function RootLayout({
   children,

@@ -1,11 +1,9 @@
+import OpenSidebarButton from "@/components/layout/open-sidebar-button";
 import Sidebar from "@/components/layout/sidebar";
 import { LogoText } from "@/components/ui/logo-text";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Organization, User } from "@/lib/schemas";
 import { getOrganizations } from "@/server/organization";
 import { getCurrentUser } from "@/server/user";
-import { HamburgerMenuIcon } from "@radix-ui/react-icons";
-import OpenSidebarButton from "@/components/layout/open-sidebar-button";
 
 export default async function Layout({
   children,

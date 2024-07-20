@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { showError } from "@/lib/utils";
-import { addPaymentMethod } from "@/server/billing";
+import { addPaymentMethod } from "@/server/payment-method";
 import { PlusCircle } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 

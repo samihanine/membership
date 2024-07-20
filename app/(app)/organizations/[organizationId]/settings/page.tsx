@@ -1,7 +1,6 @@
 import { OrganizationForm } from "@/components/organization/organization-form";
-import { CardDescription, CardTitle } from "@/components/ui/card";
+import { CardTitle } from "@/components/ui/card";
 import { Organization } from "@/lib/schemas";
-import { showSuccess } from "@/lib/utils";
 import { getOrganization } from "@/server/organization";
 import { getCurrentUser } from "@/server/user";
 import { redirect } from "next/navigation";

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/sheet";
 import { CARD_PRICE_IN_EURO_CENTS } from "@/lib/contants";
 import { Member, PaymentMethod } from "@/lib/schemas";
-import { showError } from "@/lib/utils";
+import { showError, showSuccess } from "@/lib/utils";
 import { createOrders } from "@/server/order";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
@@ -39,13 +39,16 @@ export default function CreateOrderButton({
     resolver: zodResolver(formSchema),
   });
 
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = async () => {
     const result = await executeAsync({
       memberIds: members.map((member) => member.id),
       organizationId,
     });
 
     if (result?.data?.success) {
+      showSuccess({
+        message: "Les cartes ont été commandées avec succès.",
+      });
       setOpen(false);
     } else if (result?.data?.error) {
       showError({
@@ -103,7 +106,7 @@ export default function CreateOrderButton({
                     <CardContent>
                       <div className="text-sm text-muted-foreground">
                         Si l&apos;adresse d&apos;un membre est incomplète, la
-                        carte sera envoyée à l&apos;adresse de votre
+                        carte sera expédié à l&apos;adresse de votre
                         organisation.
                       </div>
                     </CardContent>

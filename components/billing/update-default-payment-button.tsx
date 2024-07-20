@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { PaymentMethod } from "@/lib/schemas";
-import { updateDefaultPaymentMethod } from "@/server/billing";
+import { updateDefaultPaymentMethod } from "@/server/payment-method";
 import { useAction } from "next-safe-action/hooks";
 
 export default function UpdateDefaultPaymentMethodButton({

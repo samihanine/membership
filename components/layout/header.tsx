@@ -5,10 +5,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
 import { MenuIcon } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
-import ThemeToggle from "./theme-toggle";
 import HeaderLink from "./header-link";
+import ThemeToggle from "./theme-toggle";
 
 export default function Header({
   links,

@@ -13,9 +13,6 @@ export async function GET(request: NextRequest) {
 
   let error: string | undefined = undefined;
   const path = await handlePaymentSuccess(sessionId).catch((e) => {
-    console.log("---------------------------------");
-    console.log("Error", e);
-    console.log("---------------------------------");
     error = e;
   });
 

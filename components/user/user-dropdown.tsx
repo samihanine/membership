@@ -1,18 +1,17 @@
 "use client";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { LogOut } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import Image from "next/image";
-import { logOut } from "@/server/auth";
-import { useAction } from "next-safe-action/hooks";
 import { User } from "@/lib/schemas";
+import { logOut } from "@/server/auth";
+import { LogOut } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
+import { useState } from "react";
 import EditUserButton from "./edit-user-button";
 
 export default function UserDropdown({ user }: { user: User }) {

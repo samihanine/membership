@@ -1,22 +1,15 @@
 "use client";
 
-import {
-  ChartBarIcon,
-  CogIcon,
-  EnvelopeIcon,
-  HomeIcon,
-  UserCircleIcon,
-} from "@heroicons/react/24/outline";
 import SelectOrganization from "@/components/organization/select-organization";
 import { Organization, User } from "@/lib/schemas";
+import { cn } from "@/lib/utils";
+import { CogIcon, HomeIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { XIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import UserDropdown from "../user/user-dropdown";
 import { LogoText } from "../ui/logo-text";
-import { XIcon } from "lucide-react";
+import UserDropdown from "../user/user-dropdown";
 import ThemeToggle from "./theme-toggle";
-import { Button } from "../ui/button";
 
 const MenuItem: React.FC<{
   children: React.ReactNode;

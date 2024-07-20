@@ -9,8 +9,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { PaymentMethod } from "@/lib/schemas";
-import { deletePaymentMethod } from "@/server/billing";
-import { PlusCircle } from "lucide-react";
+import { deletePaymentMethod } from "@/server/payment-method";
 import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 

@@ -1,11 +1,9 @@
+import OrderTable from "@/components/order/order-table";
+import { CardTitle } from "@/components/ui/card";
+import { Transaction } from "@/lib/schemas";
+import { getTransactions } from "@/server/billing";
 import { getCurrentUser } from "@/server/user";
 import { redirect } from "next/navigation";
-import React from "react";
-import { CardTitle } from "@/components/ui/card";
-import { getOrders } from "@/server/order";
-import OrderTable from "@/components/order/order-table";
-import { Order, Transaction } from "@/lib/schemas";
-import { getTransactions } from "@/server/billing";
 
 export default async function Page({
   params,
