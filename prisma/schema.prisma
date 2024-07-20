@@ -74,7 +74,6 @@ model Member {
   id                  String       @id @default(uuid())
   user                User?        @relation(fields: [userId], references: [id])
   userId              String?      @unique
-  addressId           String?
   phoneNumber         String?
   note                String       @default("")
   email               String?
@@ -84,60 +83,53 @@ model Member {
   imageUrl            String?
   organization        Organization @relation(fields: [organizationId], references: [id])
   membershipExpiresAt DateTime?
-  formattedAddress    String?
-  isMembershipActive  Boolean      @default(true)
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
-  deletedAt           DateTime?
 
-  address Address? @relation(fields: [addressId], references: [id])
-  orders  Order[]
+  address     String?
+  address2    String?
+  city        String?
+  region      String?
+  postalCode  String?
+  countryCode String  @default("FR")
+
+  isMembershipActive Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+
+  orders Order[]
 }
 
 model Organization {
-  id                String  @id @default(uuid())
-  currency          String  @default("eur")
-  country           String  @default("FR")
-  name              String
-  email             String
-  addressId         String?
-  description       String?
-  imageUrl          String?
-  imageCardBackUrl  String?
-  imageCardFrontUrl String?
-  formattedAddress  String?
+  id String @id @default(uuid())
+
+  name                     String
+  email                    String
+  description              String?
+  imageUrl                 String?
+  imageCardBackUrl         String?
+  imageCardFrontUrl        String?
+  printagsImageCardBackId  String?
+  printagsImageCardFrontId String?
 
   stripeCustomerId String?
+  currency         String  @default("eur")
+
+  address     String
+  address2    String?
+  city        String
+  region      String
+  postalCode  String
+  countryCode String  @default("FR")
 
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   deletedAt         DateTime?
-  address           Address?           @relation(fields: [addressId], references: [id])
   organizationUsers OrganizationUser[]
   members           Member[]
   invitations       Invitation[]
   paymentMethods    PaymentMethod[]
   transactions      Transaction[]
   orders            Order[]
-}
-
-model Address {
-  id               String         @id @default(uuid())
-  unit             String?
-  formattedAddress String
-  streetNumber     String?
-  streetName       String?
-  city             String?
-  region           String?
-  postalCode       String?
-  country          String
-  latitude         Float
-  longitude        Float
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  deletedAt        DateTime?
-  members          Member[]
-  organizations    Organization[]
 }
 
 enum TransactionStatus {
@@ -171,13 +163,21 @@ enum OrderStatus {
 }
 
 model Order {
-  id             String      @id @default(uuid())
-  transactionId  String?
-  memberId       String
-  status         OrderStatus @default(PENDING)
+  id            String      @id @default(uuid())
+  transactionId String?
+  memberId      String
+  status        OrderStatus @default(PENDING)
+
+  address     String
+  address2    String?
+  city        String
+  region      String
+  postalCode  String
+  countryCode String  @default("FR")
+
   organizationId String
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
   deletedAt      DateTime?
 
   transaction  Transaction? @relation(fields: [transactionId], references: [id])
@@ -194,7 +194,7 @@ model PaymentMethod {
   expYear               Int
   isDefault             Boolean @default(true)
   brand                 String  @default("visa")
-  country               String  @default("FR")
+  countryCode           String  @default("FR")
   name                  String?
   email                 String?
   phoneNumber           String?

@@ -48,6 +48,12 @@ export function OrganizationForm({
       imageUrl: organization?.imageUrl ?? undefined,
       description: organization?.description ?? "",
       email: organization?.email ?? email ?? "",
+      address: organization?.address ?? "",
+      address2: organization?.address2 ?? "",
+      city: organization?.city ?? "",
+      postalCode: organization?.postalCode ?? "",
+      countryCode: organization?.countryCode ?? "",
+      region: organization?.region ?? "",
     },
   });
   const { executeAsync: createAsync, status: createStatus } =
@@ -77,12 +83,10 @@ export function OrganizationForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-8 w-full self-center"
+        className="flex flex-col gap-3 w-full self-center"
       >
-        <div className="flex flex-col gap-4">
-          <FormLabel>Logo de l&apos;organisation</FormLabel>
-
-          <Avatar className="w-20 h-20 text-xl">
+        <div className="grid grid-cols-4 gap-3 items-center">
+          <Avatar className="w-20 h-20 text-xl col-span-1">
             {!!imageUrl?.length && typeof imageUrl === "string" ? (
               <Image
                 src={form.getValues("imageUrl") as string}
@@ -97,6 +101,7 @@ export function OrganizationForm({
           </Avatar>
 
           <UploadImageInput
+            className="col-span-3"
             folder="ORGANIZATION_LOGOS"
             setImageUrl={(url) => {
               form.setValue("imageUrl", url);
@@ -108,10 +113,17 @@ export function OrganizationForm({
           control={form.control}
           name="name"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nom de l&apos;organisation</FormLabel>
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel>
+                Nom
+                <span className="text-red-500 ml-1">*</span>
+              </FormLabel>
               <FormControl>
-                <Input placeholder="ex: Apple Inc." {...field} />
+                <Input
+                  placeholder="ex: Apple Inc."
+                  className="col-span-3 !mt-0"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -121,10 +133,13 @@ export function OrganizationForm({
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email de l&apos;organisation</FormLabel>
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel>
+                Email <span className="text-red-500 ml-1">*</span>
+              </FormLabel>
               <FormControl>
                 <Input
+                  className="col-span-3 !mt-0"
                   type="email"
                   placeholder="ex: billing@apple.com"
                   {...field}
@@ -138,11 +153,110 @@ export function OrganizationForm({
           control={form.control}
           name="description"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
+                  className="col-span-3 !mt-0"
                   placeholder="ex: Apple Inc. est une organisation américaine spécialisée dans les technologies informatiques."
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel>
+                Adresse <span className="text-red-500 ml-1">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="ex: 1 rue de Paris"
+                  className="col-span-3 !mt-0"
+                  required
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="address2"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel>Adresse 2</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="ex: appartement 12"
+                  className="col-span-3 !mt-0"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="city"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel>
+                Ville <span className="text-red-500 ml-1">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="ex: Paris"
+                  className="col-span-3 !mt-0"
+                  required
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="region"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel>
+                Région <span className="text-red-500 ml-1">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="ex: Ile de France"
+                  className="col-span-3 !mt-0"
+                  required
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="countryCode"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel>
+                Pays <span className="text-red-500 ml-1">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="ex: France"
+                  className="col-span-3 !mt-0"
+                  required
                   {...field}
                 />
               </FormControl>
@@ -152,7 +266,7 @@ export function OrganizationForm({
         />
         <Button
           type="submit"
-          className="w-full max-w-md"
+          className="w-fit self-center mt-4"
           disabled={
             createStatus === "executing" || updateStatus === "executing"
           }

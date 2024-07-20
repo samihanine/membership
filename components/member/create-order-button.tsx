@@ -18,6 +18,7 @@ import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 const formSchema = z.object({});
 
@@ -71,14 +72,18 @@ export default function CreateOrderButton({
 
           <div className="h-2" />
 
-          <div className="flex items-center justify-center gap-1 flex-col">
-            <p className="text-sm text-muted-foreground">
-              Prix pour {members.length} carte(s)
-            </p>
-            <p className="text-4xl font-medium">
-              {(members.length * CARD_PRICE_IN_EURO_CENTS) / 100}€
-            </p>
-          </div>
+          <Card>
+            <CardHeader className="!pb-3">
+              <p className="text-sm text-muted-foreground">
+                Prix pour {members.length} carte(s)
+              </p>
+            </CardHeader>
+            <CardContent>
+              <p className="text-4xl font-medium">
+                {(members.length * CARD_PRICE_IN_EURO_CENTS) / 100}€
+              </p>
+            </CardContent>
+          </Card>
 
           <div className="h-2" />
 
@@ -89,6 +94,20 @@ export default function CreateOrderButton({
                 className="space-y-8"
               >
                 <>
+                  <Card>
+                    <CardHeader className="!pb-3">
+                      <CardTitle className="text-base text-red-500">
+                        Attention !
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-sm text-muted-foreground">
+                        Si l&apos;adresse d&apos;un membre est incomplète, la
+                        carte sera envoyée à l&apos;adresse de votre
+                        organisation.
+                      </div>
+                    </CardContent>
+                  </Card>
                   <Button
                     type="submit"
                     className="w-full"

@@ -16,7 +16,7 @@ export default function MemberAvatar({
       className={cn(
         size === "sm" ? "w-8 h-8 text-base" : "",
         size === "md" ? "w-12 h-12 text-lg" : "",
-        size === "lg" ? "w-20 h-20 text-2xl" : "",
+        size === "lg" ? "w-16 h-16 text-2xl" : "",
       )}
     >
       {!!member.imageUrl?.length ? (

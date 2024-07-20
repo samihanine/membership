@@ -111,7 +111,7 @@ export async function handlePaymentSuccess(sessionId: string) {
       expYear: stripePaymentMethod.card.exp_year,
       isDefault: true,
       brand: stripePaymentMethod.card.brand || undefined,
-      country: stripePaymentMethod.card.country || undefined,
+      countryCode: stripePaymentMethod.card.countryCode || undefined,
       name: stripePaymentMethod.billing_details?.name || undefined,
       email: stripePaymentMethod.billing_details?.email || undefined,
       phoneNumber: stripePaymentMethod.billing_details?.phone || undefined,

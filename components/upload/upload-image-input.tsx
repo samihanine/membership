@@ -20,7 +20,7 @@ export default function UploadImageInput({
     <Input
       type="file"
       accept="image/*"
-      className={cn("w-fit border border-border", className)}
+      className={cn("w-full border border-border", className)}
       disabled={status === "executing"}
       onChange={async (e) => {
         const file = e.target.files?.[0];

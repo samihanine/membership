@@ -27,8 +27,7 @@ export default function EditMemberButton({
         <SheetHeader>
           <SheetTitle>Modifier un membre</SheetTitle>
           <SheetDescription>
-            Modifier les informations du membre, puis cliquez sur
-            &quot;Enregistrer&quot; pour valider les modifications.
+            Modifier les informations du membre.
           </SheetDescription>
           <div className="h-2" />
           <MemberForm

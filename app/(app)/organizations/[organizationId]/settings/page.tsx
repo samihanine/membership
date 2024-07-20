@@ -1,6 +1,7 @@
 import { OrganizationForm } from "@/components/organization/organization-form";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Organization } from "@/lib/schemas";
+import { showSuccess } from "@/lib/utils";
 import { getOrganization } from "@/server/organization";
 import { getCurrentUser } from "@/server/user";
 import { redirect } from "next/navigation";
@@ -23,7 +24,7 @@ export default async function Page({
   }
 
   return (
-    <>
+    <div className="flex flex-col">
       <div>
         <CardTitle className="text-lg mb-1">
           Modifiez votre organisation
@@ -32,7 +33,9 @@ export default async function Page({
 
       <div className="mb-6" />
 
-      <OrganizationForm organization={organization.data as Organization} />
-    </>
+      <div className="w-full">
+        <OrganizationForm organization={organization.data as Organization} />
+      </div>
+    </div>
   );
 }

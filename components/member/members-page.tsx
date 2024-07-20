@@ -84,7 +84,7 @@ export default function MembersPage({
             </div>
           )}
 
-          <Button variant="outline" className="gap-1">
+          <Button variant="outline" className="gap-1 hidden">
             <File className="h-3.5 w-3.5" />
             <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
               Importer
@@ -141,10 +141,10 @@ export default function MembersPage({
                     Phone number
                   </TableHead>
                   <TableHead className="hidden md:table-cell">
-                    Date d&apos;expiration
+                    Date d&apos;ajout
                   </TableHead>
 
-                  <TableHead>Commander</TableHead>
+                  <TableHead>Carte de membre</TableHead>
                   <TableHead>
                     <span className="sr-only">Actions</span>
                   </TableHead>
@@ -204,25 +204,15 @@ export default function MembersPage({
                       </TableCell>
                       <TableCell>{member.lastName}</TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {member.email?.length ? member.email : "N/A"}
+                        {member.email?.length ? member.email : ""}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {member.phoneNumber?.length
-                          ? member.phoneNumber
-                          : "N/A"}
+                        {member.phoneNumber?.length ? member.phoneNumber : ""}
                       </TableCell>
 
                       <TableCell className="hidden md:table-cell">
-                        <Badge
-                          variant={
-                            member.membershipExpiresAt ? "green" : "outline"
-                          }
-                        >
-                          {member.membershipExpiresAt
-                            ? new Date(
-                                member.membershipExpiresAt,
-                              ).toLocaleDateString()
-                            : "N/A"}
+                        <Badge variant={"outline"}>
+                          {new Date(member.createdAt).toLocaleDateString()}
                         </Badge>
                       </TableCell>
 

@@ -8,23 +8,21 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { showError } from "@/lib/utils";
 import { Member, memberSchema } from "@/lib/schemas";
+import { showError } from "@/lib/utils";
 import { createMember, updateMember } from "@/server/member";
-import { useParams } from "next/navigation";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useEffect } from "react";
-import Image from "next/image";
-import UploadImageInput from "../upload/upload-image-input";
-import { useAction } from "next-safe-action/hooks";
 import moment from "moment";
+import { useAction } from "next-safe-action/hooks";
+import { useParams } from "next/navigation";
+import { useEffect } from "react";
+import UploadImageInput from "../upload/upload-image-input";
+import MemberAvatar from "./member-avatar";
 
 const formSchema = memberSchema.omit({
   createdAt: true,
@@ -56,9 +54,13 @@ export function MemberForm({
       imageUrl: member?.imageUrl ?? "",
       organizationId:
         (params.organizationId as string) ?? member?.organizationId ?? "",
-      membershipExpiresAt:
-        member?.membershipExpiresAt ??
-        new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+      membershipExpiresAt: member?.membershipExpiresAt,
+      address: member?.address ?? "",
+      address2: member?.address2 ?? "",
+      city: member?.city ?? "",
+      region: member?.region ?? "",
+      postalCode: member?.postalCode ?? "",
+      countryCode: member?.countryCode ?? "",
     },
   });
 
@@ -85,24 +87,22 @@ export function MemberForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-3"
+      >
         <div className="flex justify-between items-center gap-4">
-          <Avatar className="w-20 h-20 text-xl">
-            {!!imageUrl.length && typeof imageUrl === "string" ? (
-              <Image
-                src={form.getValues("imageUrl") as string}
-                alt="Avatar"
-                width={44}
-                height={44}
-                className="!w-full object-cover"
-              />
-            ) : (
-              <AvatarFallback>
-                {form.getValues("firstName")[0]}{" "}
-                {form.getValues("lastName")?.[0] || ""}
-              </AvatarFallback>
-            )}
-          </Avatar>
+          <MemberAvatar
+            size="lg"
+            member={
+              {
+                ...member,
+                imageUrl: imageUrl,
+                firstName: form.getValues("firstName"),
+                lastName: form.getValues("lastName"),
+              } as Member
+            }
+          />
 
           <UploadImageInput
             folder="MEMBER_PROFILE_PICTURES"
@@ -112,46 +112,59 @@ export function MemberForm({
             }}
           />
         </div>
-        <div className="flex justify-between items-center gap-4">
-          <FormField
-            control={form.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Prénom</FormLabel>
-                <FormControl>
-                  <Input required placeholder="ex: Dorian" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nom de famille</FormLabel>
-                <FormControl>
-                  <Input required placeholder="ex: Ham" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="firstName"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel>
+                Prénom
+                <span className="text-red-500 ml-1">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="!mt-0 col-span-3"
+                  required
+                  placeholder="ex: Dorian"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="lastName"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel>
+                Nom<span className="text-red-500 ml-1">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="!mt-0 col-span-3"
+                  required
+                  placeholder="ex: Ham"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-2">
-                Email <FormDescription>(optionnel)</FormDescription>
-              </FormLabel>
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel className="flex gap-2">Email</FormLabel>
               <FormControl>
                 <Input
                   placeholder="ex: dorian@example.com"
                   type="email"
+                  className="!mt-0 col-span-3"
                   {...field}
                   value={field.value || ""}
                 />
@@ -164,30 +177,13 @@ export function MemberForm({
           control={form.control}
           name="phoneNumber"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-2">
-                Numéro de téléphone{" "}
-                <FormDescription>(optionnel)</FormDescription>
-              </FormLabel>
-              <FormControl>
-                <Input type="tel" placeholder="06 12 34 56 78" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="formattedAddress"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-2">
-                Adresse complète <FormDescription>(optionnel)</FormDescription>
-              </FormLabel>
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel className="flex gap-2">Téléphone </FormLabel>
               <FormControl>
                 <Input
-                  type="text"
-                  placeholder="ex: 1 rue de la Paix, Paris, FR"
+                  type="tel"
+                  placeholder="06 12 34 56 78"
+                  className="col-span-3 !mt-0"
                   {...field}
                 />
               </FormControl>
@@ -197,22 +193,84 @@ export function MemberForm({
         />
         <FormField
           control={form.control}
-          name="membershipExpiresAt"
+          name="address"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-2">
-                Date d&apos;expiration de l&apos;adhésion{" "}
-                <FormDescription>(optionnel)</FormDescription>
-              </FormLabel>
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel className="flex gap-2">Adresse </FormLabel>
               <FormControl>
                 <Input
-                  type="date"
+                  placeholder="ex: 1 rue de Paris"
+                  className="col-span-3 !mt-0"
                   {...field}
-                  value={
-                    field.value
-                      ? moment(new Date(field.value)).format("YYYY-MM-DD")
-                      : ""
-                  }
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="address2"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel className="flex gap-2">Adresse 2</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="ex: appartement 12"
+                  className="col-span-3 !mt-0"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="city"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel className="flex gap-2">Ville</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="ex: Paris"
+                  className="col-span-3 !mt-0"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="region"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel className="flex gap-2">Région</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="ex: Ile de France"
+                  className="col-span-3 !mt-0"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="countryCode"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel className="flex gap-2">Pays</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="ex: France"
+                  className="col-span-3 !mt-0"
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -220,7 +278,7 @@ export function MemberForm({
           )}
         />
         <Button
-          className="z-50 w-full"
+          className="z-50 w-full mt-4"
           type="submit"
           disabled={
             updateStatus === "executing" || createStatus === "executing"

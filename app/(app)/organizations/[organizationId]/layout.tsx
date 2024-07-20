@@ -45,7 +45,7 @@ export default async function Layout({
             )}
           </div>
 
-          <section className="flex-1 max-w-7xl w-full mx-auto py-10 px-10">
+          <section className="flex-1 max-w-6xl w-full mx-auto py-10 px-10">
             {children}
           </section>
         </div>

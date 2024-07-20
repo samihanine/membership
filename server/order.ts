@@ -6,6 +6,8 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { stripe } from "@/lib/stripe";
 import { CARD_PRICE_IN_EURO_CENTS } from "@/lib/contants";
+import { Order } from "@/lib/schemas";
+import { Prisma } from "@prisma/client";
 
 export const createOrders = authActionClient
   .schema(
@@ -23,6 +25,15 @@ export const createOrders = authActionClient
         },
       };
     }
+
+    const members = await prisma.member.findMany({
+      where: {
+        id: {
+          in: parsedInput.memberIds,
+        },
+      },
+    });
+
     const amount = CARD_PRICE_IN_EURO_CENTS * quantity;
 
     const organization = await prisma.organization.findUnique({
@@ -49,14 +60,16 @@ export const createOrders = authActionClient
       currency: organization.currency,
     });
 
-    await stripe.invoiceItems.create({
-      quantity,
-      unit_amount: CARD_PRICE_IN_EURO_CENTS,
-      customer: organization.stripeCustomerId,
-      description: `Carte de membre`,
-      currency: organization.currency,
-      invoice: invoice.id,
-    });
+    for (const member of members) {
+      await stripe.invoiceItems.create({
+        quantity: 1,
+        unit_amount: CARD_PRICE_IN_EURO_CENTS,
+        customer: organization.stripeCustomerId,
+        description: `Carte de membre pour ${member.firstName} ${member.lastName}`,
+        currency: organization.currency,
+        invoice: invoice.id,
+      });
+    }
 
     invoice = await stripe.invoices.finalizeInvoice(invoice.id, {});
 
@@ -75,13 +88,38 @@ export const createOrders = authActionClient
       },
     });
 
+    let organizationAddress = {
+      address: organization.address,
+      address2: organization.address2,
+      city: organization.city,
+      region: organization.region,
+      postalCode: organization.postalCode,
+      countryCode: organization.countryCode,
+    };
+
     await prisma.order.createMany({
-      data: parsedInput.memberIds.map((memberId) => ({
-        memberId,
-        organizationId: parsedInput.organizationId,
-        status: "PENDING",
-        transactionId: transaction.id,
-      })),
+      data: members.map((member) => {
+        let address = {
+          address: member.address,
+          address2: member.address2,
+          city: member.city,
+          region: member.region,
+          postalCode: member.postalCode,
+          countryCode: member.countryCode,
+        };
+
+        if (!address.address || !address.city || !address.postalCode) {
+          address = organizationAddress;
+        }
+
+        return {
+          memberId: member.id,
+          organizationId: parsedInput.organizationId,
+          status: "PENDING",
+          transactionId: transaction.id,
+          ...address,
+        } as unknown as Prisma.OrderCreateManyInput;
+      }),
     });
 
     revalidatePath(`/organization/${parsedInput.organizationId}/members`);

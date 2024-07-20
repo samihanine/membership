@@ -1,16 +1,33 @@
 "use server";
 
 import axios from "axios";
-import type { Address } from "@prisma/client";
-import prisma from "../lib/prisma";
-import type { Prisma } from "@prisma/client";
+import { z } from "zod";
+
+export const addressSchema = z.object({
+  unit: z.string().optional(),
+  formattedAddress: z.string(),
+  streetNumber: z.string().optional(),
+  streetName: z.string().optional(),
+  city: z.string().optional(),
+  region: z.string().optional(),
+  postalCode: z.string().optional(),
+  countryCode: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+  id: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  deletedAt: z.date().optional(),
+});
+
+export type Address = z.infer<typeof addressSchema>;
 
 export async function autocompleteAddress(query: string): Promise<Address[]> {
   const apiKey = process.env.GEOAPIFY_API_KEY;
   const lyon = "45.7578137,4.8320114";
   const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
     query,
-  )}&lang=fr&limit=5&format=json&apiKey=${apiKey}&bias=proximity:${lyon}&filter=countrycode:fr`;
+  )}&lang=fr&limit=5&format=json&apiKey=${apiKey}&bias=proximity:${lyon}&filter=countryCodecode:fr`;
 
   try {
     const response = await axios.get(url);
@@ -21,7 +38,7 @@ export async function autocompleteAddress(query: string): Promise<Address[]> {
         city: result.city,
         region: result.region,
         postalCode: result.postcode,
-        country: result.country,
+        countryCode: result.countryCode,
         latitude: result.lat,
         longitude: result.lon,
         formattedAddress: result.formatted || result.name,
@@ -31,10 +48,4 @@ export async function autocompleteAddress(query: string): Promise<Address[]> {
     console.error("Error fetching autocomplete addresses:", error);
     return [];
   }
-}
-
-export async function createAddress(address: Prisma.AddressCreateInput) {
-  return await prisma.address.create({
-    data: address,
-  });
 }
