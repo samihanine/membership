@@ -1,7 +1,6 @@
 "use client";
 
 import AddMemberButton from "@/components/member/add-member-button";
-import MemberTable from "@/components/member/member-table";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,18 +9,41 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import { Member } from "@/lib/schemas";
+import { Member, PaymentMethod } from "@/lib/schemas";
 import { CreditCardIcon, File } from "lucide-react";
 import { useState } from "react";
-import SubscribeMemberButton from "./subscribe-members-button";
+import OrderButton from "./create-order-button";
 import { showError } from "@/lib/utils";
+import { MoreHorizontal } from "lucide-react";
+import Image from "next/image";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Badge } from "../ui/badge";
+import { Checkbox } from "../ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
+import DeleteMemberButton from "./delete-member-button";
+import EditMemberButton from "./edit-member-button";
 
 export default function MembersPage({
   organizationId,
   members,
+  paymentMethods,
 }: {
   organizationId: string;
   members: Member[];
+  paymentMethods: PaymentMethod[];
 }) {
   const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
   return (
@@ -36,15 +58,18 @@ export default function MembersPage({
 
         <div className="ml-auto flex items-center gap-4">
           {selectedMembers.length > 0 ? (
-            <SubscribeMemberButton members={selectedMembers}>
+            <OrderButton
+              members={selectedMembers}
+              organizationId={organizationId}
+              paymentMethods={paymentMethods}
+            >
               <Button variant={"outline"}>
                 <CreditCardIcon className="h-3.5 w-3.5 mr-2" />
-                Commandez les cartes
+                Commandez {selectedMembers.length} carte(s)
               </Button>
-            </SubscribeMemberButton>
+            </OrderButton>
           ) : (
-            <Button
-              variant="outline"
+            <div
               onClick={() => {
                 showError({
                   message:
@@ -52,9 +77,11 @@ export default function MembersPage({
                 });
               }}
             >
-              <CreditCardIcon className="h-3.5 w-3.5 mr-2" />
-              Commandez les cartes
-            </Button>
+              <Button variant="outline" disabled={true}>
+                <CreditCardIcon className="h-3.5 w-3.5 mr-2" />
+                Commandez les cartes
+              </Button>
+            </div>
           )}
 
           <Button variant="outline" className="gap-1">
@@ -87,12 +114,177 @@ export default function MembersPage({
               </div>
             </div>
           )}
+
           {!!members.length && (
-            <MemberTable
-              members={members}
-              selectedMembers={selectedMembers}
-              setSelectedMembers={setSelectedMembers}
-            />
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>
+                    <Checkbox
+                      checked={selectedMembers.length > 0}
+                      onClick={() => {
+                        if (selectedMembers.length === 0) {
+                          setSelectedMembers([
+                            ...members.filter((m) => !m.orders?.length),
+                          ]);
+                        } else {
+                          setSelectedMembers([]);
+                        }
+                      }}
+                    />
+                  </TableHead>
+                  <TableHead className="w-[100px]">Photo</TableHead>
+                  <TableHead>Prénom</TableHead>
+                  <TableHead>Nom</TableHead>
+                  <TableHead className="hidden md:table-cell">Email</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Phone number
+                  </TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Date d&apos;expiration
+                  </TableHead>
+
+                  <TableHead>Commander</TableHead>
+                  <TableHead>
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {members
+                  .sort(
+                    (a, b) =>
+                      new Date(b.updatedAt).getTime() -
+                      new Date(a.updatedAt).getTime(),
+                  )
+                  .map((member) => (
+                    <TableRow
+                      key={member.id}
+                      className={
+                        selectedMembers.includes(member) ? "!bg-primary/20" : ""
+                      }
+                    >
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedMembers.includes(member)}
+                          disabled={(member.orders?.length || 0) > 0}
+                          onClick={() => {
+                            if ((member.orders?.length || 0) > 0) return;
+
+                            if (selectedMembers.includes(member)) {
+                              setSelectedMembers(
+                                selectedMembers.filter((m) => m !== member),
+                              );
+                            } else {
+                              setSelectedMembers([...selectedMembers, member]);
+                            }
+                          }}
+                        />
+                      </TableCell>
+
+                      <TableCell>
+                        <Avatar className="w-11 h-11 text-base">
+                          {!!member.imageUrl?.length ? (
+                            <Image
+                              src={member.imageUrl as string}
+                              alt="Avatar"
+                              width={44}
+                              height={44}
+                              className="!w-full object-cover"
+                            />
+                          ) : (
+                            <AvatarFallback>
+                              {member.firstName[0]} {member.lastName?.[0] || ""}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {member.firstName}
+                      </TableCell>
+                      <TableCell>{member.lastName}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {member.email?.length ? member.email : "N/A"}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {member.phoneNumber?.length
+                          ? member.phoneNumber
+                          : "N/A"}
+                      </TableCell>
+
+                      <TableCell className="hidden md:table-cell">
+                        <Badge
+                          variant={
+                            member.membershipExpiresAt ? "green" : "outline"
+                          }
+                        >
+                          {member.membershipExpiresAt
+                            ? new Date(
+                                member.membershipExpiresAt,
+                              ).toLocaleDateString()
+                            : "N/A"}
+                        </Badge>
+                      </TableCell>
+
+                      <TableCell>
+                        {!!member.orders?.length && (
+                          <>
+                            {member.orders[0].status === "SUCCEEDED" && (
+                              <Badge variant="green">à une carte</Badge>
+                            )}
+                            {member.orders[0].status === "PENDING" && (
+                              <Badge variant="warning">
+                                En cours de livraison
+                              </Badge>
+                            )}
+                            {member.orders[0].status === "FAILED" && (
+                              <Badge variant="destructive">Echec</Badge>
+                            )}
+                          </>
+                        )}
+                        {!member.orders?.length && (
+                          <OrderButton
+                            members={[member]}
+                            organizationId={organizationId}
+                            paymentMethods={paymentMethods}
+                          >
+                            <Button variant="outline" size="sm">
+                              Commander
+                            </Button>
+                          </OrderButton>
+                        )}
+                      </TableCell>
+
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              aria-haspopup="true"
+                              size="icon"
+                              variant="ghost"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            className="flex flex-col justify-start"
+                            align="end"
+                          >
+                            <EditMemberButton member={member}>
+                              <DropdownMenuLabel>Editer</DropdownMenuLabel>
+                            </EditMemberButton>
+
+                            <DeleteMemberButton member={member}>
+                              <DropdownMenuLabel>Supprimer</DropdownMenuLabel>
+                            </DeleteMemberButton>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>

@@ -1,5 +1,6 @@
 import MembersPage from "@/components/member/members-page";
-import { Member } from "@/lib/schemas";
+import { Member, PaymentMethod } from "@/lib/schemas";
+import { getPaymentMethods } from "@/server/billing";
 import { getMembers } from "@/server/member";
 import { getCurrentUser } from "@/server/user";
 import { redirect } from "next/navigation";
@@ -17,10 +18,15 @@ export default async function Members({
 
   const result = await getMembers({ organizationId });
 
+  const paymentMethods = await getPaymentMethods({
+    organizationId: organizationId,
+  });
+
   return (
     <MembersPage
       members={result?.data as Member[]}
       organizationId={organizationId}
+      paymentMethods={(paymentMethods?.data as PaymentMethod[]) || []}
     />
   );
 }

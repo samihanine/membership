@@ -1,15 +1,10 @@
 "use server";
 
-import Stripe from "stripe";
-import { getCurrentUser } from "./user";
 import { prisma } from "../lib/prisma";
 import { authActionClient } from "@/lib/safe-action";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2023-10-16",
-});
+import { stripe } from "@/lib/stripe";
 
 export const addPaymentMethod = authActionClient
   .schema(
@@ -91,13 +86,14 @@ export async function handlePaymentSuccess(sessionId: string) {
   }
   const paymentMethodId = setupIntent.payment_method as string;
 
-  const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+  const stripePaymentMethod =
+    await stripe.paymentMethods.retrieve(paymentMethodId);
 
-  if (!paymentMethod) {
+  if (!stripePaymentMethod) {
     throw new Error("Méthode de paiement introuvable");
   }
 
-  if (!paymentMethod.card) {
+  if (!stripePaymentMethod.card) {
     throw new Error("Carte introuvable");
   }
 
@@ -109,16 +105,27 @@ export async function handlePaymentSuccess(sessionId: string) {
   await prisma.paymentMethod.create({
     data: {
       organizationId: organization.id,
-      stripePaymentMethodId: paymentMethod.id,
-      lastFourDigits: paymentMethod.card.last4,
-      expMonth: paymentMethod.card.exp_month,
-      expYear: paymentMethod.card.exp_year,
+      stripePaymentMethodId: stripePaymentMethod.id,
+      lastFourDigits: stripePaymentMethod.card.last4,
+      expMonth: stripePaymentMethod.card.exp_month,
+      expYear: stripePaymentMethod.card.exp_year,
       isDefault: true,
-      brand: paymentMethod.card.brand || undefined,
-      country: paymentMethod.card.country || undefined,
-      name: paymentMethod.billing_details?.name || undefined,
-      email: paymentMethod.billing_details?.email || undefined,
-      phoneNumber: paymentMethod.billing_details?.phone || undefined,
+      brand: stripePaymentMethod.card.brand || undefined,
+      country: stripePaymentMethod.card.country || undefined,
+      name: stripePaymentMethod.billing_details?.name || undefined,
+      email: stripePaymentMethod.billing_details?.email || undefined,
+      phoneNumber: stripePaymentMethod.billing_details?.phone || undefined,
+    },
+  });
+
+  // attach payment method to customer
+  await stripe.paymentMethods.attach(paymentMethodId, {
+    customer: organization.stripeCustomerId as string,
+  });
+
+  await stripe.customers.update(organization.stripeCustomerId as string, {
+    invoice_settings: {
+      default_payment_method: stripePaymentMethod.id,
     },
   });
 
@@ -202,6 +209,9 @@ export const updateDefaultPaymentMethod = authActionClient
   .action(async ({ parsedInput }) => {
     const paymentMethod = await prisma.paymentMethod.findUnique({
       where: { id: parsedInput.id },
+      include: {
+        organization: true,
+      },
     });
 
     if (!paymentMethod) {
@@ -209,6 +219,16 @@ export const updateDefaultPaymentMethod = authActionClient
         error: {
           message: "Méthode de paiement introuvable.",
           code: "PAYMENT_METHOD_NOT_FOUND",
+        },
+      };
+    }
+
+    if (!paymentMethod.organization.stripeCustomerId) {
+      return {
+        error: {
+          message:
+            "Aucun moyen de paiement n'est associé à cette organisation.",
+          code: "NO_PAYMENT_METHOD",
         },
       };
     }
@@ -223,7 +243,79 @@ export const updateDefaultPaymentMethod = authActionClient
       data: { isDefault: true },
     });
 
+    await stripe.customers.update(
+      paymentMethod.organization.stripeCustomerId as string,
+      {
+        invoice_settings: {
+          default_payment_method: paymentMethod.stripePaymentMethodId,
+        },
+      },
+    );
+
     revalidatePath(`/organizations/${result.organizationId}/settings/billing`);
 
     return result;
+  });
+
+export const getBillingPortalSessionUrl = authActionClient
+  .schema(
+    z.object({
+      organizationId: z.string(),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    const organization = await prisma.organization.findUnique({
+      where: { id: parsedInput.organizationId },
+    });
+
+    if (!organization) {
+      return {
+        error: {
+          message: "Organisation introuvable.",
+          code: "ORGANIZATION_NOT_FOUND",
+        },
+      };
+    }
+
+    if (!organization.stripeCustomerId) {
+      return {
+        error: {
+          message:
+            "Aucun moyen de paiement n'est associé à cette organisation.",
+          code: "NO_PAYMENT_METHOD",
+        },
+      };
+    }
+
+    const session = await stripe.billingPortal.sessions.create({
+      customer: organization.stripeCustomerId,
+      return_url:
+        process.env.NEXT_PUBLIC_BASE_URL +
+        "/organizations/" +
+        organization.id +
+        "/settings/billing",
+    });
+
+    return {
+      url: session.url,
+    };
+  });
+
+export const getTransactions = authActionClient
+  .schema(
+    z.object({
+      organizationId: z.string(),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    return prisma.transaction.findMany({
+      where: { organizationId: parsedInput.organizationId },
+      include: {
+        orders: {
+          include: {
+            member: true,
+          },
+        },
+      },
+    });
   });

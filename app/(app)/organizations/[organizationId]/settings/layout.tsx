@@ -32,7 +32,7 @@ export default function Layout({
       label: "Visuel des cartes",
     },
     {
-      href: `/organizations/${params.organizationId}/settings/commands`,
+      href: `/organizations/${params.organizationId}/settings/orders`,
       label: "Commandes",
     },
     {
@@ -58,12 +58,12 @@ export default function Layout({
       <div className="flex gap-8 flex-col w-full">
         <nav className="flex" x-chunk="dashboard-04-chunk-0"></nav>
         <Card className="flex-1 !p-0">
-          <CardHeader className="flex flex-col md:!flex-row md:items-end border-b border-border md:!pt-3 md:!pb-0">
+          <CardHeader className="flex flex-col lg:!flex-row lg:items-end border-b border-border lg:!pt-3 lg:!pb-0">
             {links.map(({ href, label }) => (
               <Link key={href} href={href}>
                 <div
                   className={cn(
-                    "w-full text-sm md:border-b-2 border-transparent whitespace-nowrap relative pb-2 text-muted-foreground hover:text-primary font-bold px-4 py-3",
+                    "w-full text-sm lg:border-b-2 border-transparent whitespace-nowrap relative pb-2 text-muted-foreground hover:text-primary font-bold px-4 py-3",
                     pathname === href ? "border-primary text-primary" : "",
                   )}
                 >

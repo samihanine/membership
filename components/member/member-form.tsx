@@ -219,17 +219,15 @@ export function MemberForm({
             </FormItem>
           )}
         />
-        <div className="flex justify-end">
-          <Button
-            className="z-50"
-            type="submit"
-            disabled={
-              updateStatus === "executing" || createStatus === "executing"
-            }
-          >
-            {member ? "Mettre à jour" : "Ajouter un membre"}
-          </Button>
-        </div>
+        <Button
+          className="z-50 w-full"
+          type="submit"
+          disabled={
+            updateStatus === "executing" || createStatus === "executing"
+          }
+        >
+          {member ? "Mettre à jour" : "Ajouter un membre"}
+        </Button>
       </form>
     </Form>
   );

@@ -122,11 +122,14 @@ export function UserForm({
             </FormItem>
           )}
         />
-        <div className="flex justify-end">
-          <Button type="submit" disabled={updateStatus === "executing"}>
-            Mettre à jour
-          </Button>
-        </div>
+
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={updateStatus === "executing"}
+        >
+          Mettre à jour
+        </Button>
       </form>
     </Form>
   );

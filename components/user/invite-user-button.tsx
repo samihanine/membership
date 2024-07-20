@@ -23,7 +23,7 @@ export default function InviteUserButton({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger>
+      <SheetTrigger asChild>
         {children ?? (
           <Button className="gap-1">
             <PlusCircle className="h-3.5 w-3.5" />

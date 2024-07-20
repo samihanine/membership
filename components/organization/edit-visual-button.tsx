@@ -56,7 +56,7 @@ export default function EditVisualButton({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger>
+      <SheetTrigger asChild>
         {children ?? (
           <Button className="gap-1">
             <EditIcon className="h-3.5 w-3.5" />

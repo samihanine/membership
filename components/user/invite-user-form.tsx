@@ -118,15 +118,13 @@ export function InviteUserForm({
             </FormItem>
           )}
         />
-        <div className="flex justify-end">
-          <Button
-            className="z-50"
-            type="submit"
-            disabled={createStatus === "executing"}
-          >
-            {"Inviter un utilisateur"}
-          </Button>
-        </div>
+        <Button
+          className="z-50 w-full"
+          type="submit"
+          disabled={createStatus === "executing"}
+        >
+          {"Inviter un utilisateur"}
+        </Button>
       </form>
     </Form>
   );

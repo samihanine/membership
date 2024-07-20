@@ -33,7 +33,7 @@ export default function DeletePaymentMethodButton({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger>
+      <SheetTrigger asChild>
         {children ?? (
           <Button className="gap-1" variant={"destructive"}>
             <span className="sm:whitespace-nowrap">Supprimer</span>

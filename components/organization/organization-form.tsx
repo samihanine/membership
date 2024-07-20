@@ -75,7 +75,10 @@ export function OrganizationForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-8 w-full self-center"
+      >
         <div className="flex flex-col gap-4">
           <FormLabel>Logo de l&apos;organisation</FormLabel>
 
@@ -147,16 +150,15 @@ export function OrganizationForm({
             </FormItem>
           )}
         />
-        <div className="flex justify-end">
-          <Button
-            type="submit"
-            disabled={
-              createStatus === "executing" || updateStatus === "executing"
-            }
-          >
-            {organization ? "Mettre à jour" : "Créer"}
-          </Button>
-        </div>
+        <Button
+          type="submit"
+          className="w-full max-w-md"
+          disabled={
+            createStatus === "executing" || updateStatus === "executing"
+          }
+        >
+          {organization ? "Mettre à jour" : "Créer"}
+        </Button>
       </form>
     </Form>
   );

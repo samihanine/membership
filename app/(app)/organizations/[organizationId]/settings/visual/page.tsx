@@ -57,14 +57,14 @@ export default async function Page({
   ];
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
       <div className="flex items-center">
         <CardTitle className="text-lg text-center">
           Modifier le visuel des cartes
         </CardTitle>
       </div>
 
-      <div className="flex w-full flex-wrap gap-5 sm:gap-12">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 w-full max-w-4xl self-center">
         {cards.map((card, index) => (
           <Card key={index} className="!shadow-none">
             <CardHeader>
@@ -77,7 +77,7 @@ export default async function Page({
                 width={(CARD_WIDTH / CARD_HEIGHT) * 200}
                 height={(CARD_HEIGHT / CARD_WIDTH) * 200}
                 alt={card.title}
-                className="border border-border"
+                className="border border-border w-full h-auto"
               />
             </CardContent>
             <CardFooter className="flex gap-3 justify-center">

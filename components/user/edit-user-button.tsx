@@ -35,12 +35,13 @@ export default function EditUserButton({
         )}
       </SheetTrigger>
       <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Modifier mon compte</SheetTitle>
-          <SheetDescription>
-            Modifier les informations de mon compte
-          </SheetDescription>
-          <div className="h-2" />
+        <SheetHeader className="flex flex-col gap-5">
+          <div>
+            <SheetTitle>Modifier mon compte</SheetTitle>
+            <SheetDescription>
+              Modifier les informations de mon compte
+            </SheetDescription>
+          </div>
           <UserForm
             user={user}
             onSuccess={() => {
@@ -50,6 +51,12 @@ export default function EditUserButton({
               setOpen(false);
             }}
           />
+          <div className="border border-b border-border" />
+
+          <div className="flex flex-col gap-3">
+            <Button variant={"outline"}>Changer de mot de passe</Button>
+            <Button variant={"destructive"}>Supprimer mon compte</Button>
+          </div>
         </SheetHeader>
       </SheetContent>
     </Sheet>

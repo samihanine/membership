@@ -78,5 +78,8 @@ export const getMembers = authActionClient
         organizationId: parsedInput.organizationId,
         deletedAt: null,
       },
+      include: {
+        orders: true,
+      },
     });
   });

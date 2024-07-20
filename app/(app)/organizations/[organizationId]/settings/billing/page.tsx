@@ -1,7 +1,7 @@
 import AddPaymentMethodButton from "@/components/billing/add-payment-method-button";
+import GetBillingPortalUrlButton from "@/components/billing/get-billing-portal-url-button";
 import DeletePaymentMethodButton from "@/components/billing/delete-payment-method-button";
 import UpdateDefaultPaymentMethodButton from "@/components/billing/update-default-payment-button";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/card";
 import { PaymentMethod } from "@/lib/schemas";
 import { getPaymentMethods } from "@/server/billing";
+import { getOrganization } from "@/server/organization";
 import { getCurrentUser } from "@/server/user";
 import { StarIcon } from "@heroicons/react/20/solid";
-import Image from "next/image";
 import { redirect } from "next/navigation";
 
 export default async function Page({
@@ -31,16 +31,34 @@ export default async function Page({
     organizationId: params.organizationId,
   });
 
+  const organization = await getOrganization({ id: params.organizationId });
+
+  if (!organization) {
+    return redirect("/");
+  }
+
   return (
-    <>
+    <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <CardTitle className="text-lg mb-1">Moyens de paiement</CardTitle>
 
-        <AddPaymentMethodButton organizationId={params.organizationId} />
+        <div className="flex flex-wrap gap-3">
+          <GetBillingPortalUrlButton organizationId={params.organizationId} />
+          <AddPaymentMethodButton organizationId={params.organizationId} />
+        </div>
       </div>
 
+      {!paymentMethods?.data?.length && (
+        <div>
+          <div className="border-b border-border w-full overflow-x-auto" />
+
+          <div className="text-center text-sm text-muted-foreground mt-5">
+            Vous n&apos;avez pas encore ajouté de moyen de paiement.
+          </div>
+        </div>
+      )}
       {!!paymentMethods?.data?.length && (
-        <div className="flex flex-col gap-5 mt-8 w-fit">
+        <div className="flex flex-col gap-5 w-fit">
           {paymentMethods.data
             .sort(
               (a, b) =>
@@ -144,6 +162,6 @@ export default async function Page({
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }

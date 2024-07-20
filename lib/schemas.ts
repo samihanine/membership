@@ -32,6 +32,7 @@ export const orderSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().optional(),
+  member: z.any().nullish(),
 });
 
 export type Order = z.infer<typeof orderSchema>;
@@ -39,15 +40,15 @@ export type Order = z.infer<typeof orderSchema>;
 export const transactionSchema = z.object({
   userId: z.string(),
   amount: z.number(),
-  currency: z.string().default("EUR"),
-  stripeSessionId: z.string(),
-  stripePaymentIntentId: z.string().optional(),
+  currency: z.string().default("eur"),
+  stripeSessionId: z.string().optional(),
+  stripeInvoiceId: z.string(),
   status: z.enum(["PENDING", "SUCCEEDED", "FAILED"]).default("PENDING"),
   id: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().optional(),
-  order: orderSchema.nullish(),
+  orders: z.array(orderSchema).optional(),
 });
 
 export type Transaction = z.infer<typeof transactionSchema>;
