@@ -22,6 +22,13 @@ import { useEffect } from "react";
 import UploadImageInput from "../upload/upload-image-input";
 import MemberAvatar from "./member-avatar";
 import moment from "moment";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const formSchema = memberSchema.omit({
   createdAt: true,
@@ -251,6 +258,23 @@ export function MemberForm({
         />
         <FormField
           control={form.control}
+          name="postalCode"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel className="flex gap-2">Code postal</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="ex: 75001"
+                  className="col-span-3 !mt-0"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="city"
           render={({ field }) => (
             <FormItem className="grid grid-cols-4 gap-3 items-center">
@@ -289,13 +313,16 @@ export function MemberForm({
           render={({ field }) => (
             <FormItem className="grid grid-cols-4 gap-3 items-center">
               <FormLabel className="flex gap-2">Pays</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="ex: France"
-                  className="col-span-3 !mt-0"
-                  {...field}
-                />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionnez un pays" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="FR">France</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

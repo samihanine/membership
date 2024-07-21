@@ -18,7 +18,7 @@ export default async function Page() {
   }
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
+    <div className="min-h-screen flex justify-center items-center p-10">
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="text-2xl">Ajouter une organisation</CardTitle>

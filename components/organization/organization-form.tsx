@@ -10,7 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { showError } from "@/lib/utils";
+import { showError, showSuccess } from "@/lib/utils";
 import { organizationSchema } from "@/lib/schemas";
 import {
   Organization,
@@ -25,6 +25,13 @@ import { z } from "zod";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import UploadImageInput from "../upload/upload-image-input";
 import { Textarea } from "../ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 const formSchema = organizationSchema.omit({
   id: true,
   createdAt: true,
@@ -52,7 +59,7 @@ export function OrganizationForm({
       address2: organization?.address2 ?? "",
       city: organization?.city ?? "",
       postalCode: organization?.postalCode ?? "",
-      countryCode: organization?.countryCode ?? "",
+      countryCode: organization?.countryCode ?? "FR",
       region: organization?.region ?? "",
     },
   });
@@ -72,6 +79,11 @@ export function OrganizationForm({
         message: result.data.error.message,
       });
     } else if (result?.data?.organization?.id) {
+      showSuccess({
+        message: organization
+          ? "Organisation mise à jour."
+          : "Organisation créée.",
+      });
       onSuccess?.(result.data.organization as Organization);
     } else {
       showError({
@@ -210,6 +222,26 @@ export function OrganizationForm({
         />
         <FormField
           control={form.control}
+          name="postalCode"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel>
+                Code postal <span className="text-red-500 ml-1">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="ex: 75001"
+                  className="col-span-3 !mt-0"
+                  required
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="city"
           render={({ field }) => (
             <FormItem className="grid grid-cols-4 gap-3 items-center">
@@ -253,17 +285,19 @@ export function OrganizationForm({
           name="countryCode"
           render={({ field }) => (
             <FormItem className="grid grid-cols-4 gap-3 items-center">
-              <FormLabel>
+              <FormLabel className="flex gap-2">
                 Pays <span className="text-red-500 ml-1">*</span>
               </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="ex: France"
-                  className="col-span-3 !mt-0"
-                  required
-                  {...field}
-                />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionnez un pays" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="FR">France</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
