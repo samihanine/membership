@@ -84,10 +84,18 @@ export default async function Page({
               />
             </CardContent>
             <CardFooter className="flex gap-3 justify-center">
-              <a href={card.imageUrl} download>
+              <a
+                href={
+                  card.visualType === "FRONT"
+                    ? DEFAULT_IMAGE_CARD_FRONT_URL
+                    : DEFAULT_IMAGE_CARD_BACK_URL
+                }
+                download
+                target="_blank"
+              >
                 <Button variant={"outline"}>
                   <DownloadIcon className="h-4 w-4 mr-1" />
-                  Télécharger
+                  Télécharger le template
                 </Button>
               </a>
 

@@ -6,6 +6,7 @@ import z from "zod";
 import { organizationSchema } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
 import { CARD_HEIGHT, CARD_WIDTH } from "@/lib/contants";
+import { createCanvas, loadImage } from "canvas";
 
 export type Organization = z.infer<typeof organizationSchema>;
 
@@ -91,11 +92,9 @@ export const createOrganization = authActionClient
   });
 
 const checkCardImageSize = async (imageUrl: string) => {
-  const image = await fetch(imageUrl);
-  const blob = await image.blob();
-  const imageObject = await createImageBitmap(blob);
+  const img = await loadImage(imageUrl);
 
-  if (imageObject.width !== CARD_WIDTH || imageObject.height !== CARD_HEIGHT) {
+  if (img.width !== CARD_WIDTH || img.height !== CARD_HEIGHT) {
     return false;
   }
 
