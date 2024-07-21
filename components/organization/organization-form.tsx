@@ -67,8 +67,12 @@ export function OrganizationForm({
       ? await updateAsync({ ...values, id: organization.id })
       : await createAsync(values);
 
-    if (result?.data?.id) {
-      onSuccess?.(result.data as Organization);
+    if (result?.data?.error) {
+      showError({
+        message: result.data.error.message,
+      });
+    } else if (result?.data?.organization?.id) {
+      onSuccess?.(result.data.organization as Organization);
     } else {
       showError({
         message:

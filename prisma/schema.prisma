@@ -96,20 +96,19 @@ model Member {
   updatedAt          DateTime  @updatedAt
   deletedAt          DateTime?
 
-  orders Order[]
+  cards Card[]
 }
 
 model Organization {
   id String @id @default(uuid())
 
-  name                     String
-  email                    String
-  description              String?
-  imageUrl                 String?
-  imageCardBackUrl         String?
-  imageCardFrontUrl        String?
-  printagsImageCardBackId  String?
-  printagsImageCardFrontId String?
+  name         String
+  email        String
+  phoneNumber  String?
+  description  String?
+  imageUrl     String?
+  cardBackUrl  String?
+  cardFrontUrl String?
 
   stripeCustomerId String?
   currency         String  @default("eur")
@@ -129,7 +128,7 @@ model Organization {
   invitations       Invitation[]
   paymentMethods    PaymentMethod[]
   transactions      Transaction[]
-  orders            Order[]
+  cards             Card[]
 }
 
 enum TransactionStatus {
@@ -153,7 +152,7 @@ model Transaction {
   deletedAt       DateTime?
 
   organization Organization @relation(fields: [organizationId], references: [id])
-  orders       Order[]
+  cards        Card[]
 }
 
 enum OrderStatus {
@@ -162,7 +161,7 @@ enum OrderStatus {
   FAILED
 }
 
-model Order {
+model Card {
   id            String      @id @default(uuid())
   transactionId String?
   memberId      String
@@ -174,6 +173,19 @@ model Order {
   region      String
   postalCode  String
   countryCode String  @default("FR")
+
+  name        String
+  email       String?
+  phoneNumber String?
+
+  cardFrontUrl        String?
+  cardBackUrl         String?
+  printagsCardFrontId String?
+  printagsCardBackId  String?
+
+  adminKey   String @default(uuid())
+  counter    Int    @default(0)
+  privateKey String @default(uuid())
 
   organizationId String
   createdAt      DateTime  @default(now())

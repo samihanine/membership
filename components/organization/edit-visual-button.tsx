@@ -28,12 +28,10 @@ export default function EditVisualButton({
   organization: Organization;
 }) {
   const [open, setOpen] = useState(false);
-  const [imageCardFrontUrl, setImageCardFrontUrl] = useState(
-    organization.imageCardFrontUrl,
+  const [cardFrontUrl, setImageCardFrontUrl] = useState(
+    organization.cardFrontUrl,
   );
-  const [imageCardBackUrl, setImageCardBackUrl] = useState(
-    organization.imageCardBackUrl,
-  );
+  const [cardBackUrl, setImageCardBackUrl] = useState(organization.cardBackUrl);
   const { executeAsync, status } = useAction(updateOrganization);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -41,11 +39,15 @@ export default function EditVisualButton({
 
     const result = await executeAsync({
       id: organization.id,
-      imageCardFrontUrl: imageCardFrontUrl || undefined,
-      imageCardBackUrl: imageCardBackUrl || undefined,
+      cardFrontUrl: cardFrontUrl?.length ? cardFrontUrl : undefined,
+      cardBackUrl: cardBackUrl?.length ? cardBackUrl : undefined,
     });
 
-    if (result?.data?.id) {
+    if (result?.data?.error) {
+      showError({
+        message: result.data.error.message,
+      });
+    } else if (result?.data?.organization?.id) {
       setOpen(false);
     } else {
       showError({
@@ -79,8 +81,8 @@ export default function EditVisualButton({
             className="w-full h-auto border border-border"
             src={
               visualType === "FRONT"
-                ? imageCardFrontUrl ?? "/images/visual/front.png"
-                : imageCardBackUrl ?? "/images/visual/back.png"
+                ? cardFrontUrl ?? "/images/visual/front.png"
+                : cardBackUrl ?? "/images/visual/back.png"
             }
             width={CARD_WIDTH}
             height={CARD_HEIGHT}

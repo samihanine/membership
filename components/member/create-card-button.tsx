@@ -8,13 +8,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { CARD_PRICE_IN_EURO_CENTS } from "@/lib/contants";
-import { Member, PaymentMethod } from "@/lib/schemas";
+import { Member, Organization, PaymentMethod } from "@/lib/schemas";
 import { showError, showSuccess } from "@/lib/utils";
-import { createOrders } from "@/server/order";
+import { createCards } from "@/server/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -22,27 +22,60 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 const formSchema = z.object({});
 
-export default function CreateOrderButton({
+export default function CreateCardButton({
   children,
   members,
-  organizationId,
+  organization,
   paymentMethods,
 }: {
   children: React.ReactNode;
   members: Member[];
-  organizationId: string;
+  organization: Organization;
   paymentMethods: PaymentMethod[];
 }) {
   const [open, setOpen] = useState(false);
-  const { executeAsync, status } = useAction(createOrders);
+  const { executeAsync, status } = useAction(createCards);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
+  const warnings = useMemo(() => {
+    let array: string[] = [];
+
+    if (
+      members.some(
+        (member) =>
+          !member.address?.length ||
+          !member.city?.length ||
+          !member.postalCode?.length,
+      )
+    ) {
+      array = [
+        ...array,
+        "L'adresse de certains membres est incomplète. Leurs cartes seront expédiées à l'adresse de votre organisation.",
+      ];
+    }
+
+    if (members.some((member) => !member.imageUrl?.length)) {
+      array = [
+        ...array,
+        "Certains membres n'ont pas de photo de profil. Ils recevront une carte sans photo.",
+      ];
+    }
+
+    if (!organization.imageUrl?.length) {
+      array = [
+        ...array,
+        "Votre organisation n'a pas de logo. Les cartes seront imprimées sans logo.",
+      ];
+    }
+    return array;
+  }, [members]);
+
   const handleSubmit = async () => {
     const result = await executeAsync({
       memberIds: members.map((member) => member.id),
-      organizationId,
+      organizationId: organization.id,
     });
 
     if (result?.data?.success) {
@@ -97,20 +130,27 @@ export default function CreateOrderButton({
                 className="space-y-8"
               >
                 <>
-                  <Card>
-                    <CardHeader className="!pb-3">
-                      <CardTitle className="text-base text-red-500">
-                        Attention !
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-sm text-muted-foreground">
-                        Si l&apos;adresse d&apos;un membre est incomplète, la
-                        carte sera expédié à l&apos;adresse de votre
-                        organisation.
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {!!warnings.length && (
+                    <Card>
+                      <CardHeader className="!pb-3">
+                        <CardTitle className="text-base text-red-500">
+                          Attention !
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="list-disc list-inside flex flex-col gap-3">
+                          {warnings.map((warning) => (
+                            <li
+                              className="text-sm text-muted-foreground"
+                              key={warning}
+                            >
+                              {warning}
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
                   <Button
                     type="submit"
                     className="w-full"
@@ -125,7 +165,7 @@ export default function CreateOrderButton({
 
           {!paymentMethods.length && (
             <div>
-              <Link href={`/organizations/${organizationId}/settings/billing`}>
+              <Link href={`/organizations/${organization.id}/settings/billing`}>
                 <Button className="w-full">
                   Ajouter une méthode de paiement
                 </Button>

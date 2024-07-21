@@ -31,7 +31,7 @@ export default function Layout({
       label: "Visuel des cartes",
     },
     {
-      href: `/organizations/${params.organizationId}/settings/orders`,
+      href: `/organizations/${params.organizationId}/settings/transactions`,
       label: "Commandes",
     },
     {

@@ -2,16 +2,12 @@ import MemberAvatar from "@/components/member/member-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Member } from "@/lib/schemas";
-import { getMember } from "@/server/member";
+import { getMemberByCardId } from "@/server/card";
 import { notFound } from "next/navigation";
 
-export default async function Page({
-  params,
-}: {
-  params: { memberId: string };
-}) {
-  const result = await getMember({ id: params.memberId });
-
+export default async function Page({ params }: { params: { cardId: string } }) {
+  const result = await getMemberByCardId({ cardId: params.cardId });
+  console.log(params);
   const member = result?.data as Member;
 
   if (!member) {
@@ -34,16 +30,18 @@ export default async function Page({
           {member.membershipExpiresAt && (
             <Badge variant={"green"} className="text-sm">
               Membre jusqu&apos;au{" "}
-              {new Date(member.createdAt).toLocaleDateString("fr-FR", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {new Date(member.membershipExpiresAt).toLocaleDateString(
+                "fr-FR",
+                {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                },
+              )}
             </Badge>
           )}
 
-          {(!member.membershipExpiresAt ||
-            new Date(member.membershipExpiresAt) < new Date()) && (
+          {new Date(member.membershipExpiresAt || "") < new Date() && (
             <Badge variant={"destructive"} className="text-sm">
               Membre non abonné
             </Badge>

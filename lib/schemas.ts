@@ -1,3 +1,4 @@
+import { admin } from "googleapis/build/src/apis/admin";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 
@@ -11,8 +12,9 @@ export const organizationSchema = z.object({
     }),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
-  imageCardBackUrl: z.string().optional(),
-  imageCardFrontUrl: z.string().optional(),
+  cardBackUrl: z.string().optional(),
+  cardFrontUrl: z.string().optional(),
+  phoneNumber: z.string().optional(),
   address: z.string(),
   address2: z.string(),
   city: z.string(),
@@ -28,17 +30,27 @@ export const organizationSchema = z.object({
 
 export type Organization = z.infer<typeof organizationSchema>;
 
-export const orderSchema = z.object({
+export const cardSchema = z.object({
   transactionId: z.string(),
   memberId: z.string(),
   status: z.enum(["PENDING", "SUCCEEDED", "FAILED"]),
-
   address: z.string(),
   address2: z.string().optional(),
   city: z.string(),
   region: z.string(),
   postalCode: z.string(),
   countryCode: z.string(),
+  name: z.string(),
+  phoneNumber: z.string(),
+  email: z.string(),
+
+  cardFrontUrl: z.string().optional(),
+  cardBackUrl: z.string().optional(),
+  printagsCardFrontId: z.string().optional(),
+  printagsCardBackId: z.string().optional(),
+  adminKey: z.string(),
+  counter: z.number().default(0),
+  privateKey: z.string(),
 
   id: z.string(),
   createdAt: z.date(),
@@ -47,7 +59,7 @@ export const orderSchema = z.object({
   member: z.any().nullish(),
 });
 
-export type Order = z.infer<typeof orderSchema>;
+export type Card = z.infer<typeof cardSchema>;
 
 export const transactionSchema = z.object({
   userId: z.string(),
@@ -60,7 +72,7 @@ export const transactionSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().optional(),
-  orders: z.array(orderSchema).optional(),
+  cards: z.array(cardSchema).optional(),
 });
 
 export type Transaction = z.infer<typeof transactionSchema>;
@@ -89,7 +101,7 @@ export const memberSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   deletedAt: z.date().optional(),
-  orders: z.array(orderSchema).optional(),
+  cards: z.array(cardSchema).optional(),
 });
 
 export type Member = z.infer<typeof memberSchema>;

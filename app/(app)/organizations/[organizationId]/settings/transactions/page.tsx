@@ -1,4 +1,4 @@
-import OrderTable from "@/components/order/order-table";
+import TransactionTable from "@/components/transaction/transaction-table";
 import { CardTitle } from "@/components/ui/card";
 import { Transaction } from "@/lib/schemas";
 import { getTransactions } from "@/server/billing";
@@ -28,7 +28,7 @@ export default async function Page({
       <div>
         <div className="border-b border-border w-full overflow-x-auto" />
 
-        <OrderTable
+        <TransactionTable
           transactions={(transactions?.data as Transaction[]) || []}
         />
       </div>

@@ -5,18 +5,52 @@ import prisma from "../lib/prisma";
 import z from "zod";
 import { organizationSchema } from "@/lib/schemas";
 import { revalidatePath } from "next/cache";
+import { CARD_HEIGHT, CARD_WIDTH } from "@/lib/contants";
 
 export type Organization = z.infer<typeof organizationSchema>;
 
 export const updateOrganization = authActionClient
   .schema(organizationSchema.partial().extend({ id: z.string() }))
   .action(async ({ parsedInput: data }) => {
-    revalidatePath(`/organizations/${data.id}/settings`);
-    revalidatePath(`/organizations/${data.id}/visual`);
-    return await prisma.organization.update({
+    const organization = await prisma.organization.findUnique({
+      where: {
+        id: data.id,
+      },
+    });
+
+    if (data.cardFrontUrl && data.cardFrontUrl !== organization?.cardFrontUrl) {
+      const success = await checkCardImageSize(data.cardFrontUrl);
+      if (!success) {
+        return {
+          error: {
+            message: `L'image doit être de ${CARD_WIDTH}x${CARD_HEIGHT} pixels`,
+          },
+        };
+      }
+    }
+
+    if (data.cardBackUrl && data.cardBackUrl !== organization?.cardBackUrl) {
+      const success = await checkCardImageSize(data.cardBackUrl);
+      if (!success) {
+        return {
+          error: {
+            message: `L'image doit être de ${CARD_WIDTH}x${CARD_HEIGHT} pixels`,
+          },
+        };
+      }
+    }
+
+    const result = await prisma.organization.update({
       where: { id: data.id },
       data,
     });
+
+    revalidatePath(`/organizations/${data.id}/settings`);
+    revalidatePath(`/organizations/${data.id}/visual`);
+
+    return {
+      organization: result,
+    };
   });
 
 export const createOrganization = authActionClient
@@ -35,6 +69,15 @@ export const createOrganization = authActionClient
       },
     });
 
+    if (!result) {
+      return {
+        error: {
+          message:
+            "Une erreur s'est produite lors de la création de l'organisation",
+        },
+      };
+    }
+
     await prisma.organizationUser.create({
       data: {
         organizationId: result.id,
@@ -42,8 +85,22 @@ export const createOrganization = authActionClient
       },
     });
 
-    return result;
+    return {
+      organization: result,
+    };
   });
+
+const checkCardImageSize = async (imageUrl: string) => {
+  const image = await fetch(imageUrl);
+  const blob = await image.blob();
+  const imageObject = await createImageBitmap(blob);
+
+  if (imageObject.width !== CARD_WIDTH || imageObject.height !== CARD_HEIGHT) {
+    return false;
+  }
+
+  return true;
+};
 
 export const deleteOrganization = authActionClient
   .schema(z.object({ id: z.string() }))

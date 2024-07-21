@@ -6,9 +6,7 @@ export default function NotFound() {
       <h2 className="my-2 font-heading text-2xl font-bold mt-5 text-red-500">
         Membre introuvable
       </h2>
-      <p>
-        Désolé, le member que vous cherchez n&apos;existe pas.
-      </p>
+      <p>Désolé, le member que vous cherchez n&apos;existe pas.</p>
     </div>
   );
 }

@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "../ui/table";
 
-export default function OrderTable({
+export default function TransactionTable({
   transactions,
 }: {
   transactions: Transaction[];
@@ -85,11 +85,11 @@ export default function OrderTable({
               </TableRow>
               {currentTransactionOpen === transaction.id && (
                 <>
-                  {transaction.orders?.map((order) => (
-                    <TableRow key={order.id} className="bg-background">
+                  {transaction.cards?.map((card) => (
+                    <TableRow key={card.id} className="bg-background">
                       <TableCell></TableCell>
                       <TableCell>
-                        {order.member?.firstName} {order.member?.lastName}
+                        {card.member?.firstName} {card.member?.lastName}
                       </TableCell>
                       <TableCell></TableCell>
                       <TableCell>

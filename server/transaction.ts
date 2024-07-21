@@ -12,8 +12,6 @@ export const getTransactionInvoiceUrl = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
-    console.log("transactionId", parsedInput);
-
     const transaction = await prisma.transaction.findUnique({
       where: {
         id: parsedInput.transactionId,

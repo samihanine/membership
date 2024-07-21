@@ -10,7 +10,7 @@ import { Member } from "@prisma/client";
 export const updateMember = authActionClient
   .schema(memberSchema.partial().extend({ id: z.string() }))
   .action(async ({ parsedInput }) => {
-    delete parsedInput.orders;
+    delete parsedInput.cards;
 
     const result = await prisma.member.update({
       where: { id: parsedInput.id },
@@ -32,7 +32,7 @@ export const createMember = authActionClient
     }),
   )
   .action(async ({ parsedInput }) => {
-    delete parsedInput.orders;
+    delete parsedInput.cards;
     const result = await prisma.member.create({
       data: parsedInput as Member,
     });
@@ -79,7 +79,7 @@ export const getMembers = authActionClient
         deletedAt: null,
       },
       include: {
-        orders: true,
+        cards: true,
       },
     });
   });

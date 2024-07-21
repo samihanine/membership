@@ -62,7 +62,6 @@ export async function handlePaymentSuccess(sessionId: string) {
     },
   });
 
-  // attach payment method to customer
   await stripe.paymentMethods.attach(paymentMethodId, {
     customer: organization.stripeCustomerId as string,
   });
@@ -130,7 +129,7 @@ export const getTransactions = authActionClient
     return prisma.transaction.findMany({
       where: { organizationId: parsedInput.organizationId },
       include: {
-        orders: {
+        cards: {
           include: {
             member: true,
           },

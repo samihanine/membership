@@ -9,10 +9,10 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import { Member, PaymentMethod } from "@/lib/schemas";
+import { Member, Organization, PaymentMethod } from "@/lib/schemas";
 import { CreditCardIcon, File } from "lucide-react";
 import { useState } from "react";
-import OrderButton from "./create-order-button";
+import CreateCardButton from "./create-card-button";
 import { showError } from "@/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
@@ -37,11 +37,11 @@ import DeleteMemberButton from "./delete-member-button";
 import EditMemberButton from "./edit-member-button";
 
 export default function MembersPage({
-  organizationId,
+  organization,
   members,
   paymentMethods,
 }: {
-  organizationId: string;
+  organization: Organization;
   members: Member[];
   paymentMethods: PaymentMethod[];
 }) {
@@ -58,16 +58,16 @@ export default function MembersPage({
 
         <div className="ml-auto flex items-center gap-4">
           {selectedMembers.length > 0 ? (
-            <OrderButton
+            <CreateCardButton
               members={selectedMembers}
-              organizationId={organizationId}
+              organization={organization}
               paymentMethods={paymentMethods}
             >
               <Button variant={"outline"}>
                 <CreditCardIcon className="h-3.5 w-3.5 mr-2" />
                 Commandez {selectedMembers.length} carte(s)
               </Button>
-            </OrderButton>
+            </CreateCardButton>
           ) : (
             <div
               onClick={() => {
@@ -125,7 +125,7 @@ export default function MembersPage({
                       onClick={() => {
                         if (selectedMembers.length === 0) {
                           setSelectedMembers([
-                            ...members.filter((m) => !m.orders?.length),
+                            ...members.filter((m) => !m.cards?.length),
                           ]);
                         } else {
                           setSelectedMembers([]);
@@ -167,9 +167,9 @@ export default function MembersPage({
                       <TableCell>
                         <Checkbox
                           checked={selectedMembers.includes(member)}
-                          disabled={(member.orders?.length || 0) > 0}
+                          disabled={(member.cards?.length || 0) > 0}
                           onClick={() => {
-                            if ((member.orders?.length || 0) > 0) return;
+                            if ((member.cards?.length || 0) > 0) return;
 
                             if (selectedMembers.includes(member)) {
                               setSelectedMembers(
@@ -217,31 +217,31 @@ export default function MembersPage({
                       </TableCell>
 
                       <TableCell>
-                        {!!member.orders?.length && (
+                        {!!member.cards?.length && (
                           <>
-                            {member.orders[0].status === "SUCCEEDED" && (
+                            {member.cards[0].status === "SUCCEEDED" && (
                               <Badge variant="green">à une carte</Badge>
                             )}
-                            {member.orders[0].status === "PENDING" && (
+                            {member.cards[0].status === "PENDING" && (
                               <Badge variant="warning">
                                 En cours de livraison
                               </Badge>
                             )}
-                            {member.orders[0].status === "FAILED" && (
+                            {member.cards[0].status === "FAILED" && (
                               <Badge variant="destructive">Echec</Badge>
                             )}
                           </>
                         )}
-                        {!member.orders?.length && (
-                          <OrderButton
+                        {!member.cards?.length && (
+                          <CreateCardButton
                             members={[member]}
-                            organizationId={organizationId}
+                            organization={organization}
                             paymentMethods={paymentMethods}
                           >
                             <Button variant="outline" size="sm">
                               Commander
                             </Button>
-                          </OrderButton>
+                          </CreateCardButton>
                         )}
                       </TableCell>
 

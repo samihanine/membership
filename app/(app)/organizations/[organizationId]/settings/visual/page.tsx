@@ -11,7 +11,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
-import { CARD_HEIGHT, CARD_WIDTH } from "@/lib/contants";
+import {
+  CARD_HEIGHT,
+  CARD_WIDTH,
+  DEFAULT_IMAGE_CARD_BACK_URL,
+  DEFAULT_IMAGE_CARD_FRONT_URL,
+} from "@/lib/contants";
 import { Button } from "@/components/ui/button";
 import EditVisualButton from "@/components/organization/edit-visual-button";
 import { DownloadIcon } from "@radix-ui/react-icons";
@@ -43,15 +48,13 @@ export default async function Page({
     {
       title: "Carte recto",
       description: "Personnalisez la carte recto de votre organisation",
-      imageUrl:
-        organization.data?.imageCardFrontUrl || "/images/visual/front.png",
+      imageUrl: organization.data?.cardFrontUrl || DEFAULT_IMAGE_CARD_FRONT_URL,
       visualType: "FRONT",
     },
     {
       title: "Carte verso",
       description: "Personnalisez la carte verso de votre organisation",
-      imageUrl:
-        organization.data?.imageCardBackUrl || "/images/visual/back.png",
+      imageUrl: organization.data?.cardBackUrl || DEFAULT_IMAGE_CARD_BACK_URL,
       visualType: "BACK",
     },
   ];
