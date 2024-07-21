@@ -21,6 +21,7 @@ import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import UploadImageInput from "../upload/upload-image-input";
 import MemberAvatar from "./member-avatar";
+import moment from "moment";
 
 const formSchema = memberSchema.omit({
   createdAt: true,
@@ -52,7 +53,9 @@ export function MemberForm({
       imageUrl: member?.imageUrl ?? "",
       organizationId:
         (params.organizationId as string) ?? member?.organizationId ?? "",
-      membershipExpiresAt: member?.membershipExpiresAt,
+      membershipExpiresAt:
+        member?.membershipExpiresAt ??
+        new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
       address: member?.address ?? "",
       address2: member?.address2 ?? "",
       city: member?.city ?? "",
@@ -183,6 +186,28 @@ export function MemberForm({
                   placeholder="06 12 34 56 78"
                   className="col-span-3 !mt-0"
                   {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="membershipExpiresAt"
+          render={({ field }) => (
+            <FormItem className="grid grid-cols-4 gap-3 items-center">
+              <FormLabel className="flex gap-2">Fin d&apos;adhésion</FormLabel>
+              <FormControl>
+                <Input
+                  type="date"
+                  className="col-span-3 !mt-0"
+                  {...field}
+                  value={
+                    field.value
+                      ? moment(new Date(field.value)).format("YYYY-MM-DD")
+                      : ""
+                  }
                 />
               </FormControl>
               <FormMessage />
