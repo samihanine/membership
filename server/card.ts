@@ -189,9 +189,11 @@ const proccessTransaction = async (transactionId: string) => {
   }
 
   const cardBackUrl =
-    transaction.organization.cardBackUrl || DEFAULT_IMAGE_CARD_BACK_URL;
+    transaction.organization.cardBackUrl ||
+    process.env.NEXT_PUBLIC_BASE_URL + DEFAULT_IMAGE_CARD_BACK_URL;
   const cardFrontUrl =
-    transaction.organization.cardFrontUrl || DEFAULT_IMAGE_CARD_FRONT_URL;
+    transaction.organization.cardFrontUrl ||
+    process.env.NEXT_PUBLIC_BASE_URL + DEFAULT_IMAGE_CARD_FRONT_URL;
 
   for (const card of transaction.cards) {
     const imageSize = 294;
@@ -257,6 +259,9 @@ const proccessTransaction = async (transactionId: string) => {
       ),
       folder: "CARD_IMAGES",
     });
+
+    console.log("fileUrlBack", fileUrlBack);
+    return;
 
     const { fileUrl: fileUrlFront } = await uploadFileToTheCloud({
       file: new File(

@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 
 export async function GET(request: Request) {
-  return NextResponse.redirect(process.env.NEXT_PUBLIC_BASE_URL + "/");
+  redirect("/");
 }
