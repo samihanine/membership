@@ -215,6 +215,9 @@ export function MemberForm({
                       ? moment(new Date(field.value)).format("YYYY-MM-DD")
                       : ""
                   }
+                  onChange={(e) => {
+                    field.onChange(new Date(e.target.value));
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -313,16 +316,21 @@ export function MemberForm({
           render={({ field }) => (
             <FormItem className="grid grid-cols-4 gap-3 items-center">
               <FormLabel className="flex gap-2">Pays</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez un pays" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="FR">France</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="col-span-3">
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value || "FR"}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionnez un pays" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="FR">France</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <FormMessage />
             </FormItem>
           )}

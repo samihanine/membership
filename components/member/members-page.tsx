@@ -141,7 +141,7 @@ export default function MembersPage({
                     Phone number
                   </TableHead>
                   <TableHead className="hidden md:table-cell">
-                    Date d&apos;ajout
+                    Date d&apos;expiration
                   </TableHead>
 
                   <TableHead>Carte de membre</TableHead>
@@ -152,11 +152,7 @@ export default function MembersPage({
               </TableHeader>
               <TableBody>
                 {members
-                  .sort(
-                    (a, b) =>
-                      new Date(b.updatedAt).getTime() -
-                      new Date(a.updatedAt).getTime(),
-                  )
+                  .sort((a, b) => a.firstName.localeCompare(b.firstName))
                   .map((member) => (
                     <TableRow
                       key={member.id}
@@ -211,8 +207,19 @@ export default function MembersPage({
                       </TableCell>
 
                       <TableCell className="hidden md:table-cell">
-                        <Badge variant={"outline"}>
-                          {new Date(member.createdAt).toLocaleDateString()}
+                        <Badge
+                          variant={
+                            new Date(member.membershipExpiresAt || "") <
+                            new Date()
+                              ? "destructive"
+                              : "green"
+                          }
+                        >
+                          {member.membershipExpiresAt
+                            ? new Date(
+                                member.membershipExpiresAt,
+                              ).toLocaleDateString()
+                            : "N'expire jamais"}
                         </Badge>
                       </TableCell>
 
