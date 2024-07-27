@@ -11,7 +11,6 @@ export const generateImageBuffer = async (props: {
     width: number;
     height: number;
     alt: string;
-    borderRadius?: number;
   }[];
   texts: {
     content: string;
@@ -21,6 +20,7 @@ export const generateImageBuffer = async (props: {
     fontFamily?: string;
     color?: string;
     align?: "left" | "center" | "right";
+    fontWeight?: "normal" | "bold";
   }[];
 }) => {
   const canvas = createCanvas(props.width, props.height);
@@ -35,7 +35,7 @@ export const generateImageBuffer = async (props: {
       ctx.drawImage(img, image.x, image.y, image.width, image.height);
     } else {
       const fontSize = image.height * 0.4;
-      ctx.font = `${fontSize}px Arial`;
+      ctx.font = `bold ${fontSize}px Arial`;
       ctx.fillStyle = "black";
       ctx.textAlign = "center";
       ctx.fillText(
@@ -47,7 +47,9 @@ export const generateImageBuffer = async (props: {
   }
 
   for (const text of props.texts) {
-    ctx.font = `${text.fontSize || 24}px ${text.fontFamily || "Arial"}`;
+    ctx.font = `${text.fontWeight || "normal"} ${text.fontSize || 24}px ${
+      text.fontFamily || "Arial"
+    }`;
     ctx.fillStyle = text.color || "black";
     ctx.textAlign = text.align || "left";
     ctx.fillText(text.content, text.x, text.y);

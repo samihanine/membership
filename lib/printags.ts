@@ -29,7 +29,6 @@ export const createPrintagsFiles = async ({
     },
   );
 
-  console.log(responseFile);
   console.log(responseFile?.data);
   const fileId = responseFile?.data?.files?.file?.id;
 
@@ -80,7 +79,7 @@ export const createPrintagsOrder = async ({ card }: { card: Card }) => {
   }
 
   const responseOrder = await axios.post(
-    `https://api.printags.com/accounts/${accountId}/transactions`,
+    `https://api.printags.com/accounts/${accountId}/orders`,
     data,
     {
       headers: {
@@ -89,7 +88,9 @@ export const createPrintagsOrder = async ({ card }: { card: Card }) => {
     },
   );
 
-  const orderId = responseOrder?.data?.data?.id;
+  console.log(responseOrder.data);
+
+  const orderId = responseOrder?.data?.data?.id as string;
 
   if (!orderId) {
     throw new Error("Printags order not found");

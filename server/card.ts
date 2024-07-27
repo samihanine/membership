@@ -7,7 +7,7 @@ import {
   DEFAULT_IMAGE_CARD_BACK_URL,
   DEFAULT_IMAGE_CARD_FRONT_URL,
 } from "@/lib/contants";
-import { createPrintagsFiles } from "@/lib/printags";
+import { createPrintagsFiles, createPrintagsOrder } from "@/lib/printags";
 import prisma from "@/lib/prisma";
 import { authActionClient } from "@/lib/safe-action";
 import { stripe } from "@/lib/stripe";
@@ -17,6 +17,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { generateImageBuffer } from "./image";
 import { uploadFileToTheCloud } from "./upload";
+import { Card } from "@/lib/schemas";
 
 export const createCards = authActionClient
   .schema(
@@ -137,7 +138,7 @@ export const createCards = authActionClient
       }),
     });
 
-    // proccessTransaction(transaction.id);
+    proccessTransaction(transaction.id);
 
     revalidatePath(`/organization/${parsedInput.organizationId}/members`);
     revalidatePath(
@@ -196,58 +197,58 @@ const proccessTransaction = async (transactionId: string) => {
     process.env.NEXT_PUBLIC_BASE_URL + DEFAULT_IMAGE_CARD_FRONT_URL;
 
   for (const card of transaction.cards) {
-    const imageSize = 294;
+    const logoSize = 400;
     const imageCardFrontBuffer = await generateImageBuffer({
       backgroundImageUrl: cardFrontUrl,
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
       images: [
         {
-          url: card.member.imageUrl || undefined,
-          x: 980,
-          y: 70,
-          width: imageSize,
-          height: imageSize,
-          alt: card.member.firstName[0] + " " + card.member.lastName[0],
-          borderRadius: 40,
-        },
-      ],
-      texts: [
-        {
-          content: `${card.member.firstName} ${card.member.lastName}`,
-          x: 60,
-          y: 700,
-          fontSize: 40,
-          color: "white",
-          align: "left",
-        },
-      ],
-    });
-
-    const logoSize = 360;
-    const imageCardBackBuffer = await generateImageBuffer({
-      backgroundImageUrl: cardBackUrl,
-      width: CARD_WIDTH,
-      height: CARD_HEIGHT,
-      images: [
-        {
           url: transaction.organization.imageUrl || undefined,
-          x: CARD_WIDTH / 2 - logoSize / 2,
-          y: 173,
+          x: CARD_WIDTH / 2 - logoSize / 2 + 0.5,
+          y: 192,
           width: logoSize,
           height: logoSize,
           alt: transaction.organization.name[0],
-          borderRadius: 40,
         },
       ],
       texts: [
         {
           content: transaction.organization.name,
           x: CARD_WIDTH / 2,
-          y: 625,
+          y: 700,
           fontSize: 60,
-          color: "white",
+          color: "black",
           align: "center",
+          fontWeight: "bold",
+        },
+      ],
+    });
+
+    const imageSize = 300;
+    const imageCardBackBuffer = await generateImageBuffer({
+      backgroundImageUrl: cardBackUrl,
+      width: CARD_WIDTH,
+      height: CARD_HEIGHT,
+      images: [
+        {
+          url: card.member.imageUrl || undefined,
+          x: 987,
+          y: 60,
+          width: imageSize,
+          height: imageSize,
+          alt: card.member.firstName[0] + " " + card.member.lastName[0],
+        },
+      ],
+      texts: [
+        {
+          content: `${card.member.firstName} ${card.member.lastName}`,
+          x: 60,
+          y: 750,
+          fontSize: 60,
+          color: "black",
+          align: "left",
+          fontWeight: "bold",
         },
       ],
     });
@@ -260,9 +261,6 @@ const proccessTransaction = async (transactionId: string) => {
       folder: "CARD_IMAGES",
     });
 
-    console.log("fileUrlBack", fileUrlBack);
-    return;
-
     const { fileUrl: fileUrlFront } = await uploadFileToTheCloud({
       file: new File(
         [imageCardFrontBuffer],
@@ -270,6 +268,7 @@ const proccessTransaction = async (transactionId: string) => {
       ),
       folder: "CARD_IMAGES",
     });
+
     const printagsCardBackId = await createPrintagsFiles({
       imageBuffer: imageCardBackBuffer,
     });
@@ -278,17 +277,26 @@ const proccessTransaction = async (transactionId: string) => {
       imageBuffer: imageCardFrontBuffer,
     });
 
-    const newCard = await prisma.card.update({
+    const printagsOrderId = await createPrintagsOrder({
+      card: {
+        ...card,
+        printagsCardFrontId,
+        printagsCardBackId,
+      } as Card,
+    });
+
+    console.log(printagsOrderId);
+
+    await prisma.card.update({
       where: { id: card.id },
       data: {
         printagsCardFrontId,
         printagsCardBackId,
         cardBackUrl: fileUrlBack,
         cardFrontUrl: fileUrlFront,
+        printagsOrderId,
       },
     });
-
-    //await createPrintagsOrder({ card: newCard as Card });
   }
 };
 
